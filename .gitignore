@@ -1,0 +1,17 @@
+# Eclipse Files
+.classpath
+.project
+.settings/
+
+# Maven build directory
+/target/
+/bin/
+
+# Spring Boot auto-generated files
+*.log
+*.jar
+*.war
+
+# Operating system files
+.DS_Store
+Thumbs.db
