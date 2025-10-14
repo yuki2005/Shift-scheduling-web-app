@@ -110,13 +110,15 @@ function collectFormData(){
 
 function collectShiftConditions() {
     // name属性が "dayOfWeekString" のラジオボタンから選択された値を取得
-    const selectedDay = document.querySelector('input[name="dayOfWeekString"]:checked');
+    const selectedDay = document.querySelector('select[name = "dayOfWeekString"]');
     
     // name属性が "isHoliday" のラジオボタンから選択された値を取得
     const selectedHoliday = document.querySelector('input[name="isHoliday"]:checked');
+	
+	const dayValue = selectedDay ? selectedDay.value : null;
 
     // ラジオボタンが選択されていない場合の処理 (エラーハンドリング)
-    if (!selectedDay) {
+    if (!selectedDay || dayValue ==="") {
         throw new Error("曜日が選択されていません。");
     }
     if (!selectedHoliday) {
@@ -125,7 +127,7 @@ function collectShiftConditions() {
 
     return {
         // value属性 ("MON", "TUE"など) をそのまま使用
-        dayOfWeekString: selectedDay.value,
+        dayOfWeekString: dayValue,
         // value属性 ("true", "false") をブール値に変換
         isHoliday: selectedHoliday.value === 'true' 
     };

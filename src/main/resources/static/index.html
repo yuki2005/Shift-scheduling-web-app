@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>自動シフト作成フォーム</title>
+        <link rel = "stylesheet" href = "style.css" />
     </head>
 
 	<script type = "module" src = "./app.js"></script>
@@ -13,22 +14,29 @@
         <div id = "input-section">
             <h2>---シフト条件入力フォーム---</h2>
             <p>何曜日ですか？<br></p>
-            <input type = "radio" name = dayOfWeekString value = "MON"> 月
-            <input type = "radio" name = dayOfWeekString value = "TUE"> 火
-            <input type = "radio" name = dayOfWeekString value = "WED"> 水
-            <input type = "radio" name = dayOfWeekString value = "THR"> 木
-            <input type = "radio" name = dayOfWeekString value = "FRI"> 金
-            <input type = "radio" name = dayOfWeekString value = "SAT"> 土
-            <input type = "radio" name = dayOfWeekString value = "SUN"> 日
+            <select name="dayOfWeekString">
+                <option value="" disabled selected>--- 曜日を選択 ---</option>
+                <option value="MON">月曜日</option>
+                <option value="TUE">火曜日</option>
+                <option value="WED">水曜日</option>
+                <option value="THR">木曜日</option>
+                <option value="FRI">金曜日</option>
+                <option value="SAT">土曜日</option>
+                <option value="SUN">日曜日</option>
+            </select>
+            <br>
+            <p>休日ですか？<br></p>
+            <div class = "radio-group">
+                <input type = "radio" name = isHoliday value = "true"> はい
+                <input type = "radio" name = isHoliday value = "false">いいえ
+            </div>
             <br>
 
-            <p>休日ですか？<br></p>
-            <input type = "radio" name = isHoliday value = "true"> はい
-            <input type = "radio" name = isHoliday value = "false">いいえ
-            <br>
             <h2>---従業員データ入力フォーム---</h2>
-            <button id = "addEmployeeButton">従業員を追加</button>
-			<button id = "submitButton" type = "button">シフト割り当て実行</button>
+            <div class = "button-group">
+                <button id = "addEmployeeButton">従業員を追加</button>
+			    <button id = "submitButton" type = "button">シフト割り当て実行</button>
+            </div>
             <br>
                 <table id = "employeeTable" border = "1">
                     <thead>
