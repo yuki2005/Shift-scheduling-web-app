@@ -34,6 +34,7 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
 		return Collections.unmodifiableList(result);
 	}
 	
+	//各従業員の能力値の合計を求める
 	private Map<Employee, Integer> allSkill(List<Employee> staffs){
 		Map<Employee, Integer> result = new HashMap<>();
 		
