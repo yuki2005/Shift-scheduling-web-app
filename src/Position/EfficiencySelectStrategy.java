@@ -5,28 +5,77 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EfficiencySelectStrategy implements StaffSelectStrategy{
 	
 	@Override
-	public List<Employee> setStaff(List<Employee> ableStaff, Schedule conditions){
-		List<Employee> result = new ArrayList<>();
-		//各従業員のポジションのスキル値の合計を格納するMap
-		Map<Employee, Integer> allSkills = new HashMap<>(allSkill(ableStaff));
+	public List<Employee> selectStaff(List<Employee> ableStaff, Schedule conditions, 
+                                      List<ShiftPreference> shiftPreferences, List<ShiftTime> targetTimes){
+		//デバッグ出力
+		/*
+		System.out.println("=== WorkingStaff selection start ===");
+		for (ShiftPreference pref : shiftPreferences) {
+			for(ShiftTime time : ShiftTime.values()) {
+				System.out.println(pref.getEmployee().getName() + " => " + pref.getAvailability(time));
+			}
+		}*/
+
+		
+        // 1. Employee ID をキーとする ShiftPreference の Map を作成 (高速検索のため)
+        Map<Integer, ShiftPreference> preferenceMap = shiftPreferences.stream()
+                .collect(Collectors.toMap(p -> p.getEmployee().getId(), p -> p));
+                
+        // 2. 🔴 フィルタリング: targetTimes の制約を満たす従業員のみ残す
+        List<Employee> viableStaff = ableStaff.stream()
+                .filter(employee -> {
+                    ShiftPreference pref = preferenceMap.get(employee.getId());
+                    if (pref == null) {
+                        // 希望未提出 → 選定対象外
+                        return false;
+                    }
+
+                    // 🔧 修正：1つでも出勤可能な時間があればOK（以前は「全て出られないと除外」だった）
+                    boolean canWork = targetTimes.stream()
+                            .anyMatch(time -> pref.getAvailability(time) > 0);
+
+                    // --- デバッグ出力 ---
+                    System.out.println("【DEBUG】" + employee.getName() + " の可用性:");
+                    for (ShiftTime time : targetTimes) {
+                        System.out.println("   " + time + ": " + pref.getAvailability(time));
+                    }
+                    System.out.println("   ⇒ 判定結果: " + (canWork ? "出勤可能" : "除外"));
+
+                    return canWork;
+                })
+                .collect(Collectors.toList());
+        
+        if (viableStaff.isEmpty()) {
+            System.out.println("⚠️ どの従業員も targetTimes に対応できませんでした。");
+        }
+
+        // 3. スキル合計値の計算 (フィルタリング後の viableStaff を使用)
+		Map<Employee, Integer> allSkills = allSkill(viableStaff); 
 		
 		List<Employee> sortedStaffs = new ArrayList<>(getSortedSkillList(allSkills));
 		
-		//その日必要な最低人数を求める
-		int requiredCount = 0;
-		for(Pos p : Pos.values()) {
-			requiredCount += conditions.getRequiredCounts().getOrDefault(p, 0);
-		}
+		// Schedule から必要なポジションの合計人数を取得
+        // PosAssign が時間帯ごとに呼び出すため、ここでは全時間帯の合計ではなく、
+        // 渡された targetTimes に対応する時間帯の合計人数を参照すべきだが、
+        // PosAssign は単一の時間帯で呼び出すため、全時間帯の合計を求めます。
+        // （ロジックを簡潔にするため、今回は全時間帯の合計人数を目標値とする）
+		int requiredCount = conditions.getRequiredCountsByTime().values().stream()
+                .flatMap(m -> m.values().stream())
+                .mapToInt(Integer::intValue)
+                .sum();
 		
 		int actualCount = Math.min(requiredCount, sortedStaffs.size());
 		
-		//能力値の高い順にrequiredCount人取り出してresultに格納する
+		// 5. 能力値の高い順に選定
+		List<Employee> result = new ArrayList<>();
 		for(int i = 0; i < actualCount; i++) {
 			result.add(sortedStaffs.get(i));
 		}
@@ -34,7 +83,7 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
 		return Collections.unmodifiableList(result);
 	}
 	
-	//各従業員の能力値の合計を求める
+	//各従業員の能力値の合計を求める (変更なし)
 	private Map<Employee, Integer> allSkill(List<Employee> staffs){
 		Map<Employee, Integer> result = new HashMap<>();
 		
@@ -49,12 +98,10 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
 		return Collections.unmodifiableMap(result);
 	}
 	
-	//ポジションごとの総合スキル値を大きい順に従業員を格納したListを返すメソッド
+	//ポジションごとの総合スキル値を大きい順に従業員を格納したListを返すメソッド (変更なし)
 	private ArrayList<Employee> getSortedSkillList(Map<Employee, Integer> allSkill){
 		List<Map.Entry<Employee, Integer>> sortedEmployee = new ArrayList<>(allSkill.entrySet());
-		sortedEmployee.sort((entry1, entry2) -> {
-			return entry2.getValue().compareTo(entry1.getValue());
-		});
+		sortedEmployee.sort(Comparator.comparing(Map.Entry<Employee, Integer>::getValue).reversed());
 		
 		ArrayList<Employee> result = new ArrayList<>();
 		for(Map.Entry<Employee, Integer> entry : sortedEmployee) {

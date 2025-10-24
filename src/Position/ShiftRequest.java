@@ -1,6 +1,8 @@
 package Position;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ShiftRequest {
@@ -8,6 +10,8 @@ public class ShiftRequest {
 	private boolean isHoliday;
 	
 	private List<EmployeeDto> employeeCandidates;
+	
+	private List<ShiftPreferenceDto> shiftPreferences;
 	
 	public ShiftRequest() {
 		
@@ -25,6 +29,10 @@ public class ShiftRequest {
 		return employeeCandidates;
 	}
 	
+	public List<ShiftPreferenceDto> getShiftPreferences(){
+		return shiftPreferences;
+	}
+	
 	public void setDayOfWeekString(String dayOfWeekString) {
 		this.dayOfWeekString = dayOfWeekString;
 	}
@@ -37,11 +45,42 @@ public class ShiftRequest {
 		this.employeeCandidates = employeeCandidates;
 	}
 	
+	public void setShiftPreferences(List<ShiftPreferenceDto> shiftPreferences) {
+        this.shiftPreferences = shiftPreferences;
+    }
+	
 	//---変換ロジック---
 	
 	public List<Employee> toEmployeeList(){
 		if(employeeCandidates == null) return List.of();
 			return employeeCandidates.stream().map(EmployeeDto::toEmployee).collect(Collectors.toList());
+	}
+	
+	public List<ShiftPreference> toPreferenceList(List<Employee> employees){
+		
+		if(shiftPreferences == null || employees == null) {
+	        return List.of();
+	    }
+	    
+	    Map<Integer, Employee> employeeMap = employees.stream()
+	            .collect(Collectors.toMap(Employee::getId, Function.identity()));
+	    
+	    List<ShiftPreference> prefs = shiftPreferences.stream()
+	        .map(prefDto -> {
+	            Employee employee = employeeMap.get(prefDto.getEmployeeId());
+	            if (employee == null) return null;
+	            return ShiftPreference.fromStringMap(employee, prefDto.getAvailabilityMap());
+	        })
+	        .filter(pref -> pref != null)
+	        .collect(Collectors.toList());
+
+	    // 🟡 デバッグ出力追加
+	    /*System.out.println("[DEBUG] Preferences built: " + prefs.size());
+	    for (ShiftPreference sp : prefs) {
+	        System.out.println("[DEBUG] " + sp.getEmployee().getName() + " → " + sp);
+	    }*/
+
+	    return prefs;
 	}
 	
 	 public DayOfWeek getDayOfWeek() {

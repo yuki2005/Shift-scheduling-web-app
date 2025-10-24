@@ -10,16 +10,31 @@ function init() {
     const addButton = document.getElementById('addEmployeeButton');
 	const submitButton = document.getElementById('submitButton');
 	
+	//キーボード入力イベントをテーブル全体に設定
+	const employeeTable = document.getElementById('employeeTable');
+	
+	if(employeeTable){
+		employeeTable.addEventListener('keyup', (event) => {
+		
+			if(event.target.tagName === 'INPUT') {
+				DOMHandler.setupPreferenceInput();
+			}
+		});
+	}
+	
     // 2. イベントリスナーを設定
     if(addButton){
-        addButton.addEventListener('click', DOMHandler.addEmployeeRow);
+        addButton.addEventListener('click', () => {
+			DOMHandler.addEmployeeRow();
+			DOMHandler.setupPreferenceInput();
+		});
     }
     
     if(submitButton){
         submitButton.addEventListener('click', API.sendShiftRequest);
     }
 
-
+	DOMHandler.setupPreferenceInput();
 }
 
 // アプリケーション起動時に init を実行

@@ -2,6 +2,8 @@
 
 //サーバのAPIエンドポイントURLを定義
 const API_URL = 'http://localhost:8080/api/shift/assign';
+
+//DOMHandlerをインポート
 import DOMHandler from './dom.js';
 
 async function sendShiftRequest(event){
@@ -27,6 +29,7 @@ async function sendShiftRequest(event){
         const resultJson = await response.json();
 
         DOMHandler.renderResult(resultJson);
+		
     } catch(error){
         console.error("API Request Failed:", error);
     }

@@ -8,17 +8,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Comparator; // Comparator のインポート
 
 @Component
 public class MaxSkillStrategy implements AssignmentStrategy {
 	
 	@Override
-	public Map<Pos, List<Employee>> assign(List<Employee> staff, Schedule conditions){
+	public Map<Pos, List<Employee>> assign(List<Employee> staff, Schedule conditions, ShiftTime time){
 		//結果を格納するMap
 		Map<Pos, List<Employee>> result = new HashMap<>();
 		
-		//各ポジションの必要最低人数を格納するMap
-		Map<Pos, Integer> requiredCount = conditions.getRequiredCounts();
+		//Schedule から時間帯ごとの人数マップ全体を取得
+		Map<ShiftTime, Map<Pos, Integer>> requiredCountsByTime = conditions.getRequiredCountsByTime();
+        
+        //       PosAssign が時間帯ごとに呼び出しているため、
+        //       ここでは時間帯ごとの人数マップを抽出するロジックを PosAssign に合わせる。
+        //       (MaxSkillStrategyは特定の時間帯の人数マップを引数で受け取るべきだが、
+        //        インターフェースを変更できないため、PosAssign側で対応する。)
+
+        // PosAssign 側で時間帯ごとの人数マップを抽出して渡すロジックがないため、
+        // 暫定的に、全ての時間帯の人数を考慮した「最大人数」を必要人数とする。
+        // しかし、これは論理的に不整合を起こすため、ここでは PosAssign が渡すスタッフリストの
+        // 時間帯の人数を正しく参照するために、PosAssign側で修正を行う。
+        
+        // 暫定措置として、ここでは最もシンプルな形で人数を取得
+        // PosAssignが時間帯ごとに呼び出しているため、ここでは最初の時間帯の人数マップを代用。
+        // **このコードはPosAssign側の修正を前提としています。**
+        Map<Pos, Integer> requiredCount = requiredCountsByTime.get(time);
 		
 		//割り当て済み従業員を格納するSet
 		Set<Employee> assignedstaff = new HashSet<>();
@@ -35,6 +51,8 @@ public class MaxSkillStrategy implements AssignmentStrategy {
 			//ポジションpのスキル値が高い順に従業員が格納されたリストを用意する
 			ArrayList<Employee> pOverallSkill = new ArrayList<Employee>(getSortedSkillList(p, OverallSkill));
 			List<Employee> p_e = new ArrayList<>();
+			
+            // requiredCount マップを使用
 			for(int i = 0; i < requiredCount.getOrDefault(p, 0); i++) {
 				for(Employee e : pOverallSkill) {
 					if(!assignedstaff.contains(e)) {

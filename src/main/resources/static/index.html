@@ -25,6 +25,7 @@
                 <option value="SUN">日曜日</option>
             </select>
             <br>
+			
             <p>休日ですか？<br></p>
             <div class = "radio-group">
                 <input type = "radio" name = isHoliday value = "true"> はい
@@ -35,7 +36,7 @@
             <h2>---従業員データ入力フォーム---</h2>
             <div class = "button-group">
                 <button id = "addEmployeeButton">従業員を追加</button>
-			    <button id = "submitButton" type = "button">シフト割り当て実行</button>
+
             </div>
             <br>
                 <table id = "employeeTable" border = "1">
@@ -58,9 +59,41 @@
                 </table>
 
         </div>
+		
+		<div id = "preference-section">
+			<h2>---希望シフトの入力---</h2>
+            
+            <p>希望を提出する従業員を選択してください</p>
+            <select id = "employeePreferenceSelector">
+                <!-- javaScriptで能力値フォームに入力された従業員を追加-->
+            </select>
+
+            <!--時間帯ごとのチェックボックス-->
+            <p>出勤可能な時間帯（〇: 可 / チェック無: 不可）</p>
+            <div class = "shift-time-group">
+
+                <label><input type = "checkbox" data-shift= "TOP" checked> トップ</label>
+                <label><input type = "checkbox" data-shift= "LUNCH" checked> ランチ</label>
+                <label><input type = "checkbox" data-shift= "IDLE" checked> アイドル</label>
+                <label><input type = "checkbox" data-shift= "DINNER" checked> ディナー</label>
+                <label><input type = "checkbox" data-shift= "LAST" checked> ラスト</label>
+            </div>
+
+            <!--希望シフトの保存ボタン-->
+            <button id = "savePreferenceButton">この従業員の希望を保存</button>
+            <div id = "preferenceMessage"></div>
+		</div>	
+
+        <div style="text-align: center; margin-top: 30px; padding: 20px;">
+            <button id="submitButton" type="button" style="padding: 15px 30px; font-size: 1.2em; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                最終決定：シフト割り当て実行
+            </button>
+        </div>
 
         <div id = "result-section" style="display: none;">
             <h2>割り当て結果</h2>
+			<!-- メッセージ表示エリアをテーブル上部に追加 -->
+			<div id="resultMessage" style="font-weight: bold; margin-bottom: 10px;"></div> 
 
             <table id = "resultTable" border = "1">
                 <thead>
@@ -71,9 +104,12 @@
                 </thead>
 
                 <tbody id = "resultTableBody">
-                    <!--データはここに挿入されます--->
+                    <!--データはここに時間帯ごとに挿入されます--->
                 </tbody>
             </table>
+			
+			<!-- 選定されたスタッフリストの表示エリアを追加 -->
+			<div id="selectedStaffList" style="margin-top: 15px; font-size: 0.9em;"></div>
         </div>
         
     </body>

@@ -34,9 +34,12 @@ public class ShiftApplication {
 		boolean isHoliday = inputHandler.readIsHoliday(scanner);
 		Schedule dayDate = new Schedule(day, isHoliday);
 		
-		int totalRequired = dayDate.getRequiredCounts().values().stream()
+		List<ShiftPreference> allPreferences = inputHandler.readShiftPreferences(scanner, employees);
+		
+		int totalRequired = dayDate.getRequiredCountsByTime().values().stream()
+                .flatMap(posMap -> posMap.values().stream())
                 .mapToInt(Integer::intValue)
-                .sum();
+ 				 .sum();
 		
 		if(totalRequired > employees.size()) {
 			System.out.println("募集人数が推奨人数に達していません。募集をかけてください。");
@@ -46,10 +49,10 @@ public class ShiftApplication {
 		}
 		
 		//出勤する人を決める
-		List<Employee> commuteStaff = autoShift.selectEmployees(employees, dayDate);
+		Map<ShiftTime, List<Employee>> commuteStaff = autoShift.selectWorkingStaffByTime(employees, dayDate, allPreferences);
 		
 		//ポジションを割り振る
-		Map<Pos, List<Employee>> result = posAssign.execute(commuteStaff, dayDate);
+		Map<ShiftTime, Map<Pos, List<Employee>>> result = posAssign.execute(commuteStaff, dayDate);
 		
 		//結果を出力する
 		resultPrinter.printFullResult(employees, dayDate, result);
@@ -57,6 +60,7 @@ public class ShiftApplication {
 	
 	//プログラムのエントリーポイント	
 	public static void ShiftApp(String args[]) {
+		
 		try(Scanner scanner = new Scanner(System.in)){
 			ShiftApplication app = new ShiftApplication();
 			app.start(scanner);

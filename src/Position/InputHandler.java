@@ -115,4 +115,42 @@ public class InputHandler {
 	private String readString(Scanner scanner) {
 		return scanner.nextLine().trim();
 	}
+	
+	//希望シフトの入力
+	public List<ShiftPreference> readShiftPreferences(Scanner scanner, List<Employee> employees) {
+        List<ShiftPreference> preferences = new ArrayList<>();
+        
+        System.out.println("\n--- 希望シフト（時間帯ごとの出勤可否）を入力 ---");
+        
+        for (Employee employee : employees) {
+            Map<ShiftTime, Integer> availability = new HashMap<>();
+            
+            System.out.println("従業員: " + employee.getName());
+            
+            for (ShiftTime time : ShiftTime.values()) {
+                System.out.print(" " + time.name() + " (" + employee.getName() + "がこの時間帯に出勤可能か 0=不可, 1=可): ");
+                
+                // 0 または 1 の入力を検証
+                int available = readAndValidateAvailability(scanner);
+                availability.put(time, available);
+            }
+            // Preference オブジェクトを生成し、リストに追加
+            preferences.add(new ShiftPreference(employee, availability));
+        }
+        return preferences;
+    }
+    
+    // 🔴 新規追加: 0 または 1 の入力を検証する補助メソッド
+    private int readAndValidateAvailability(Scanner scanner) {
+        while(true) {
+            String line = scanner.nextLine().trim();
+            try {
+                int value = Integer.parseInt(line);
+                if (value == 0 || value == 1) return value;
+                else System.out.println("0 または 1 で入力してください。");
+            } catch(NumberFormatException e) {
+                System.out.println("整数値を入力してください。");
+            }
+        }
+    }
 }
