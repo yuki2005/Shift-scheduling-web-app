@@ -6,6 +6,7 @@ package Position;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 public class Employee {
 	//社員番号を記録する変数
@@ -25,6 +26,10 @@ public class Employee {
 	//従業員の能力値を取り出す
 	public int getSkill(Pos p) {
 		return skills.getOrDefault(p, 0);
+	}
+	
+	public Map<Pos, Integer> getSkills(){
+		return Collections.unmodifiableMap(skills);
 	}
 	
 	//従業員の能力値を更新する
