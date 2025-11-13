@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>シフト履歴一覧</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="./history.js"></script>
+</head>
+
+<body>
+    <h1>保存済みシフト一覧</h1>
+
+    <div style="margin-bottom:20px;">
+        <button id="loadHistoryButton" style="padding:10px 20px;">
+            履歴を読み込む
+        </button>
+    </div>
+
+    <table id="historyTable" border="1" style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>日付</th>
+                <th>曜日</th>
+                <th>休日</th>
+                <th>メッセージ</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+    </table>
+
+    <h2>選択したシフトの詳細</h2>
+    <pre id="detailView" style="background:#f0f0f0; padding:10px;"></pre>
+
+</body>
+</html>

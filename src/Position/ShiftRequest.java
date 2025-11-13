@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 public class ShiftRequest {
 	private String dayOfWeekString;
+	
+	private String date;
+	
 	private boolean isHoliday;
 	
 	private List<EmployeeDto> employeeCandidates;
@@ -17,6 +20,8 @@ public class ShiftRequest {
 		
 	}
 	//標準ゲッター
+	public String getDate() {return date;}
+	
 	public String getDayOfWeekString() {
 		return dayOfWeekString;
 	}
@@ -32,6 +37,9 @@ public class ShiftRequest {
 	public List<ShiftPreferenceDto> getShiftPreferences(){
 		return shiftPreferences;
 	}
+	
+	//標準セッター
+	public void setDate(String date) {this.date = date;}
 	
 	public void setDayOfWeekString(String dayOfWeekString) {
 		this.dayOfWeekString = dayOfWeekString;

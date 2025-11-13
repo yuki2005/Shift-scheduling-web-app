@@ -1,8 +1,12 @@
 // dom.js
 
+import API from './api.js';
+
 //希望シフトデータを保持するマップ
 //キー: 社員番号, 値: ShiftPreferenceのオブジェクト構造
 const employeePreferences = {};
+
+let latestShiftResponse = null;
 
 function updateSkillDisplay(event){
 	const slider = event.currentTarget;
@@ -65,6 +69,8 @@ function removeEmployeeRow(event){
 
 function renderAssignmentResult(result) {
     console.log("Rendering results:", result);
+	
+	latestShiftResponse = result;
 
     const resultSection = document.getElementById("result-section");
     const tbody = document.getElementById("resultTableBody");
@@ -118,16 +124,6 @@ function renderAssignmentResult(result) {
         }
     }
 }
-
-
-//外部ファイルからアクセスできるようにオブジェクトとしてエクスポート
-const DOMHandler = {
-    addEmployeeRow: addEmployeeRow,
-    removeEmployeeRow: removeEmployeeRow,
-    renderResult: renderAssignmentResult,
-	collectFormData: collectFormData,
-	setupPreferenceInput: setupPreferenceInput,
-};
 
 function setupPreferenceInput() {
     const selector = document.getElementById('employeePreferenceSelector');
@@ -218,10 +214,11 @@ function collectFormData(){
 
     const employeeCandidates = collectEmployeeData();
 	
-    // 🔴 修正: グローバルマップ employeePreferences の値をリストとして返す
+    // グローバルマップ employeePreferences の値をリストとして返す
     const shiftPreferences = Object.values(employeePreferences);
 
     const shiftRequest = {
+		date: shiftConditions.date,
         dayOfWeekString: shiftConditions.dayOfWeekString,
         isHoliday: shiftConditions.isHoliday,
         employeeCandidates: employeeCandidates,
@@ -232,6 +229,8 @@ function collectFormData(){
 }
 
 function collectShiftConditions() {
+	// シフトの日付を指定
+	const dateInput = document.getElementById("shiftDateInput");
     // name属性が "dayOfWeekString" のラジオボタンから選択された値を取得
     const selectedDay = document.querySelector('select[name = "dayOfWeekString"]');
     
@@ -247,8 +246,12 @@ function collectShiftConditions() {
     if (!selectedHoliday) {
         throw new Error("祝日かどうかが選択されていません。");
     }
+	if (!dateInput.value) {
+		throw new Error("シフト日付を入力してください。");
+	}
 
     return {
+		date: dateInput.value,
         // value属性 ("MON", "TUE"など) をそのまま使用
         dayOfWeekString: dayValue,
         // value属性 ("true", "false") をブール値に変換
@@ -336,5 +339,36 @@ function collectPreferences() {
 
     return preferencesList;
 }
+
+//保存ボタンが押された時の処理
+async function saveCurrentShift() {
+    const messageDiv = document.getElementById("saveResultMessage");
+
+    if (!latestShiftResponse) {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "保存するシフト結果がありません。";
+        return;
+    }
+
+    try {
+        const result = await API.saveShift(latestShiftResponse);
+        messageDiv.style.color = "green";
+        messageDiv.textContent = "シフトを保存しました！";
+
+    } catch (err) {
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "保存に失敗しました。";
+    }
+}
+
+//外部ファイルからアクセスできるようにオブジェクトとしてエクスポート
+const DOMHandler = {
+    addEmployeeRow: addEmployeeRow,
+    removeEmployeeRow: removeEmployeeRow,
+    renderResult: renderAssignmentResult,
+	collectFormData: collectFormData,
+	setupPreferenceInput: setupPreferenceInput,
+	saveCurrentShift: saveCurrentShift,
+};
 
 export default DOMHandler;

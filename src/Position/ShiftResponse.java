@@ -2,6 +2,9 @@ package Position;
 
 import java.util.List;
 import java.util.Map;
+import Position.Employee;
+import Position.Pos;
+import Position.ShiftTime;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,17 +20,30 @@ public class ShiftResponse {
     // 3. 警告や情報メッセージ (例: 人数不足)
     private String message;
     
-    // コンストラクタ、ゲッター、セッターが必要 (ここでは省略)
+    // 4. 日付
+    private String date;
     
-    public ShiftResponse(Map<ShiftTime, Map<Pos, List<Employee>>> finalAssignment, Map<ShiftTime, List<Employee>> workingStaff, String message) {
+    // 5. 曜日
+    private String dayOfWeek;
+    
+    // 6. 祝日かどうか
+    private boolean isHoliday;
+    
+    //コンストラクタ
+    public ShiftResponse(Map<ShiftTime, Map<Pos, List<Employee>>> finalAssignment, Map<ShiftTime, List<Employee>> workingStaff, String message,
+    		String date, String dayOfWeek, boolean holiday) {
         this.finalAssignment = finalAssignment;
         this.workingStaff = workingStaff;
         this.message = message;
+        this.date = date;
+        this.dayOfWeek = dayOfWeek;
+        this.isHoliday = holiday;
     }
     
     public ShiftResponse() {
     }
-
+    
+    
     public Map<ShiftTime, Map<Pos, List<Employee>>> getFinalAssignment() {
         return finalAssignment;
     }
@@ -39,10 +55,29 @@ public class ShiftResponse {
     public String getMessage() {
         return message;
     }
-
-    // (セッターも追加)
+    
     public void setMessage(String message) {
     	this.message = message;
     }
     
+    public String getDate() {
+        return date;
+    }
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public boolean isHoliday() {
+        return isHoliday;
+    }
+    public void setHoliday(boolean holiday) {
+        this.isHoliday = holiday;
+    }
 }

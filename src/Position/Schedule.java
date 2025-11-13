@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 public class Schedule {
-    // 🔴 修正: フィールド名に ByTime を追加し、多次元構造であることを明確にする
+    //フィールド名に ByTime を追加し、多次元構造であることを明確にする
 	private final Map<ShiftTime, Map<Pos, Integer>> requiredCountsByTime;
 	
 	//コンストラクタ

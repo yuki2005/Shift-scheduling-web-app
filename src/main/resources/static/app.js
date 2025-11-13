@@ -9,6 +9,7 @@ function init() {
     // 1. ボタン要素を取得
     const addButton = document.getElementById('addEmployeeButton');
 	const submitButton = document.getElementById('submitButton');
+	const saveButton = document.getElementById("saveShiftButton");
 	
 	//キーボード入力イベントをテーブル全体に設定
 	const employeeTable = document.getElementById('employeeTable');
@@ -33,6 +34,10 @@ function init() {
     if(submitButton){
         submitButton.addEventListener('click', API.sendShiftRequest);
     }
+	
+	if (saveButton) {
+	    saveButton.addEventListener("click", DOMHandler.saveCurrentShift);
+	}
 
 	DOMHandler.setupPreferenceInput();
 }
