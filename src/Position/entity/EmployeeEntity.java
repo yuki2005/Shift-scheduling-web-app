@@ -13,6 +13,9 @@ public class EmployeeEntity {
 
     @Column(nullable = false)
     private String name;
+    
+    @Column(nullable = false, unique = true)
+    private int employeeNumber;
 
     // JSON文字列としてskillsを保存する
     @Column(columnDefinition = "TEXT")
@@ -22,11 +25,17 @@ public class EmployeeEntity {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
+    
+    public int getEmployeeNumber() { 
+    	return employeeNumber;
+    }
+    public void setEmployeeNumber(int employeeNumber) {
+    	this.employeeNumber = employeeNumber; 
+    }
+    
     public String getName() {
         return name;
     }

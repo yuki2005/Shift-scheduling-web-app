@@ -1,151 +1,39 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>自動シフト作成フォーム</title>
-        <link rel = "stylesheet" href = "style.css" />
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>シフト管理システム - メインメニュー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-	<script type = "module" src = "./app.js"></script>
-    <body>
-        <div id = "header">
-            <h1>シフト自動割り当てシステム</h1>
-        </div>
-		
-		<div style="text-align:center; margin-top:20px;">
-		    <a href="history.html" 
-		       style="padding:10px 20px; background:#2196F3; color:white; text-decoration:none; border-radius:5px;">
-		        シフト履歴を見る
-		    </a>
-		</div>
+<body>
 
-        <div id = "input-section">
-            <h2>---シフト条件入力フォーム---</h2>
-			<p>シフト対象日<br></p>
-			<input type="date" id="shiftDateInput">
-			<br>
-            <p>何曜日ですか？<br></p>
-            <select name="dayOfWeekString">
-                <option value="" disabled selected>--- 曜日を選択 ---</option>
-                <option value="MON">月曜日</option>
-                <option value="TUE">火曜日</option>
-                <option value="WED">水曜日</option>
-                <option value="THR">木曜日</option>
-                <option value="FRI">金曜日</option>
-                <option value="SAT">土曜日</option>
-                <option value="SUN">日曜日</option>
-            </select>
-            <br>
-			
-            <p>休日ですか？<br></p>
-            <div class = "radio-group">
-                <input type = "radio" name = isHoliday value = "true"> はい
-                <input type = "radio" name = isHoliday value = "false">いいえ
-            </div>
-            <br>
+<h1 style="text-align:center;">シフト管理システム</h1>
 
-            <h2>---従業員データ入力フォーム---</h2>
-            <div class = "button-group">
-                <button id = "addEmployeeButton">従業員を追加</button>
+<div style="text-align:center; margin-top:40px;">
 
-            </div>
-            <br>
-                <table id = "employeeTable" border = "1">
-                    <thead>
-                        <tr>
-                            <th>社員番号</th>
-                            <th>名前</th>
-                            <th>デシャップ(D)</th>
-                            <th>焼(Y)</th>
-                            <th>揚(A)</th>
-                            <th>板(I)</th>
-                            <th>麺(IF)</th>
-                            <th>全体フォロー(AF)</th>
-                            <th>洗(W)</th>
-                            <th>削除</th>
-                        </tr>
-                    </thead>
-                    <tbody id = "employeeInputBody"> 
-                    </tbody>
-                </table>
+    <a href="shift.html"
+       style="padding:15px 30px; background:#4CAF50; color:white; 
+              text-decoration:none; border-radius:8px; display:block; 
+              width:250px; margin:10px auto;">
+        シフトを作成する
+    </a>
 
-        </div>
-		
-		<div id = "preference-section">
-			<h2>---希望シフトの入力---</h2>
-            
-            <p>希望を提出する従業員を選択してください</p>
-            <select id = "employeePreferenceSelector">
-                <!-- javaScriptで能力値フォームに入力された従業員を追加-->
-            </select>
+    <a href="history.html"
+       style="padding:15px 30px; background:#2196F3; color:white;
+              text-decoration:none; border-radius:8px; display:block;
+              width:250px; margin:10px auto;">
+        シフト履歴を見る
+    </a>
 
-            <!--時間帯ごとのチェックボックス-->
-            <p>出勤可能な時間帯（〇: 可 / チェック無: 不可）</p>
-            <div class = "shift-time-group">
+    <a href="employee.html"
+       style="padding:15px 30px; background:#FF9800; color:white;
+              text-decoration:none; border-radius:8px; display:block;
+              width:250px; margin:10px auto;">
+        従業員データを管理する
+    </a>
 
-                <label><input type = "checkbox" data-shift= "TOP" checked> トップ</label>
-                <label><input type = "checkbox" data-shift= "LUNCH" checked> ランチ</label>
-                <label><input type = "checkbox" data-shift= "IDLE" checked> アイドル</label>
-                <label><input type = "checkbox" data-shift= "DINNER" checked> ディナー</label>
-                <label><input type = "checkbox" data-shift= "LAST" checked> ラスト</label>
-            </div>
+</div>
 
-            <!--希望シフトの保存ボタン-->
-            <button id = "savePreferenceButton">この従業員の希望を保存</button>
-            <div id = "preferenceMessage"></div>
-		</div>	
-
-        <div style="text-align: center; margin-top: 30px; padding: 20px;">
-            <button id="submitButton" type="button" style="padding: 15px 30px; font-size: 1.2em; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                最終決定：シフト割り当て実行
-            </button>
-        </div>
-
-        <div id = "result-section" style="display: none;">
-            <h2>割り当て結果</h2>
-			<!-- メッセージ表示エリアをテーブル上部に追加 -->
-			<div id="resultMessage" style="font-weight: bold; margin-bottom: 10px;"></div> 
-
-            <table id = "resultTable" border = "1">
-                <thead>
-                    <tr>
-                        <th>ポジション</th>
-                        <th>担当者</th>
-                    </tr>
-                </thead>
-
-                <tbody id = "resultTableBody">
-                    <!--データはここに時間帯ごとに挿入されます--->
-                </tbody>
-            </table>
-			
-			<!-- 選定されたスタッフリストの表示エリアを追加 -->
-			<div id="selectedStaffList" style="margin-top: 15px; font-size: 0.9em;"></div>
-			
-			<!-- 🔥 シフト保存ボタン -->
-			<button id="saveShiftButton"
-            style="margin-top:20px; padding:10px 20px; background:#2196F3; color:white; border:none; border-radius:5px;">
-	        このシフトを保存する
-		    </button>
-
-		    <div id="saveResultMessage" style="margin-top:10px; color:green;"></div>
-        </div>
-        
-    </body>
+</body>
 </html>
-
-<template id = "employeeRowTemplate">
-    <tr>
-        <td><input type = "text" name = "employeeId"></td>
-        <td><input type = "text" name = "employeeName"></td>
-
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "D"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "Y"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "A"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "I"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "IF"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "AF"><span class = "skill-value">0</span></td>
-        <td><input type = "range" min = "0" max = "10" value = "0" data-pos = "W"><span class = "skill-value">0</span></td>
-        
-		<td><button type = "button" class = "remove-employee">削除</button></td>
-    </tr>
-</template>

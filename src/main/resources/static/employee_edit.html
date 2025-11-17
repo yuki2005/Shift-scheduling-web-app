@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>従業員編集</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="employee_edit.js"></script>
+</head>
+
+<body>
+
+<h1>従業員編集ページ</h1>
+
+<div>
+    <label>社員番号: <input type="number" id="empNumber"></label><br>
+    <label>名前: <input type="text" id="empName"></label><br>
+
+    <h3>能力値</h3>
+
+    <div class="skill-input">
+
+        <label>D:
+            <input type="range" min="0" max="10" id="skill_D">
+            <span id="val_D">0</span>
+        </label><br>
+
+        <label>Y:
+            <input type="range" min="0" max="10" id="skill_Y">
+            <span id="val_Y">0</span>
+        </label><br>
+
+        <label>A:
+            <input type="range" min="0" max="10" id="skill_A">
+            <span id="val_A">0</span>
+        </label><br>
+
+        <label>I:
+            <input type="range" min="0" max="10" id="skill_I">
+            <span id="val_I">0</span>
+        </label><br>
+
+        <label>IF:
+            <input type="range" min="0" max="10" id="skill_IF">
+            <span id="val_IF">0</span>
+        </label><br>
+
+        <label>AF:
+            <input type="range" min="0" max="10" id="skill_AF">
+            <span id="val_AF">0</span>
+        </label><br>
+
+        <label>W:
+            <input type="range" min="0" max="10" id="skill_W">
+            <span id="val_W">0</span>
+        </label><br>
+
+    </div>
+
+    <button id="saveEmployeeBtn">保存</button>
+    <button onclick="location.href='employee.html'">戻る</button>
+</div>
+
+</body>
+</html>

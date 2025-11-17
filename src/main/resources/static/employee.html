@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>従業員管理</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="./employee.js"></script>
+</head>
+
+<body>
+
+<h1>従業員管理ページ</h1>
+
+<!-- 新規登録 -->
+<h2>従業員を登録</h2>
+<div>
+    <label>社員番号: <input type="number" id="empNumber"></label><br>
+    <label>名前: <input type="text" id="empName"></label><br>
+
+    <h3>能力値</h3>
+
+    <div class="skill-input">
+        <label>D:
+            <input type="range" min="0" max="10" id="skill_D" value="0">
+            <span id="val_D">0</span>
+        </label><br>
+
+        <label>Y:
+            <input type="range" min="0" max="10" id="skill_Y" value="0">
+            <span id="val_Y">0</span>
+        </label><br>
+
+        <label>A:
+            <input type="range" min="0" max="10" id="skill_A" value="0">
+            <span id="val_A">0</span>
+        </label><br>
+
+        <label>I:
+            <input type="range" min="0" max="10" id="skill_I" value="0">
+            <span id="val_I">0</span>
+        </label><br>
+
+        <label>IF:
+            <input type="range" min="0" max="10" id="skill_IF" value="0">
+            <span id="val_IF">0</span>
+        </label><br>
+
+        <label>AF:
+            <input type="range" min="0" max="10" id="skill_AF" value="0">
+            <span id="val_AF">0</span>
+        </label><br>
+
+        <label>W:
+            <input type="range" min="0" max="10" id="skill_W" value="0">
+            <span id="val_W">0</span>
+        </label><br>
+    </div>
+
+    <button id="createEmployeeBtn">登録</button>
+</div>
+
+<hr>
+
+<!-- 一覧表示 -->
+<h2>従業員一覧</h2>
+<table border="1" width="100%">
+    <thead>
+        <tr>
+            <th>社員番号</th>
+            <th>名前</th>
+            <th>スキル</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody id="employeeTableBody"></tbody>
+</table>
+<br>
+
+<div>
+	<a href = "shift.html"
+	   style="padding:10px 20px; background:#2196F3; color:white; text-decoration:none; border-radius:5px;">
+	戻る
+	</a>
+</div>
+<br>
+<div>
+	<a href = "index.html"
+	   style="padding:10px 20px; background:#2196F3; color:white; text-decoration:none; border-radius:5px;">
+	メインメニューに戻る
+	</a>
+</div>
+
+
+		
+</body>
+</html>

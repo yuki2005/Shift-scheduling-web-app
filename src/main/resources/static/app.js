@@ -43,4 +43,7 @@ function init() {
 }
 
 // アプリケーション起動時に init を実行
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () -> {
+	DOMHandler.loadEmployeeFromDB(); 
+	DOMHandler.setupPreferenceInput();
+});

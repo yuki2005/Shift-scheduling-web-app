@@ -8,6 +8,37 @@ const employeePreferences = {};
 
 let latestShiftResponse = null;
 
+async function loadEmployeeFromDB() {
+    const API = "http://localhost:8080/api/employees";
+
+    const res = await fetch(API);
+    const employees = await res.json();
+
+    const tbody = document.getElementById("employeeInputBody");
+    tbody.innerHTML = "";
+
+    employees.forEach(emp => {
+        const { id, name, skills } = emp;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td><input type="text" name="employeeId" value="${id}" readonly></td>
+            <td><input type="text" name="employeeName" value="${name}" readonly></td>
+            ${Object.keys(skills).map(pos => `
+                <td><input type="range" min="0" max="10" value="${skills[pos]}" data-pos="${pos}" disabled>
+                    <span>${skills[pos]}</span></td>
+            `).join("")}
+            <td></td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    console.log("従業員データをDBから読み込みました");
+}
+
+
 function updateSkillDisplay(event){
 	const slider = event.currentTarget;
 	const valueSpan = slider.nextElementSibling;
