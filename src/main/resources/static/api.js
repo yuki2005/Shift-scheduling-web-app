@@ -61,7 +61,6 @@ async function saveShift(responseData) {
 const APIHandler = {
     sendShiftRequest: sendShiftRequest,
 	saveShift: saveShift,
-
 };
 
 export default APIHandler;

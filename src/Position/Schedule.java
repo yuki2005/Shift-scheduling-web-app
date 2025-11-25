@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Collections;
 
 public class Schedule {
-    //フィールド名に ByTime を追加し、多次元構造であることを明確にする
+	//各時間帯での各ポジションの必要最低人数を記録
 	private final Map<ShiftTime, Map<Pos, Integer>> requiredCountsByTime;
 	
 	//コンストラクタ

@@ -77,7 +77,7 @@ public class ShiftRequest {
 	        .map(prefDto -> {
 	            Employee employee = employeeMap.get(prefDto.getEmployeeId());
 	            if (employee == null) return null;
-	            return ShiftPreference.fromStringMap(employee, prefDto.getAvailabilityMap());
+	            return ShiftPreference.fromStringMap(employee, prefDto.getAvailabilityMap(), prefDto.getDate());
 	        })
 	        .filter(pref -> pref != null)
 	        .collect(Collectors.toList());

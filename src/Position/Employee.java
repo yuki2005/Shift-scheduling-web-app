@@ -20,7 +20,9 @@ public class Employee {
 	public Employee(int id, String name, Map<Pos, Integer> initialskills){
 		this.id = id;
 		this.name = name;
-		this.skills = new HashMap<>(initialskills);
+		this.skills = (initialskills == null) 
+				? new HashMap<>()
+				: new HashMap<>(initialskills);
 	}
 	
 	//従業員の能力値を取り出す

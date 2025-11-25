@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>希望シフト入力</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="./preference_app.js"></script>
+</head>
+<body>
+
+<h1>希望シフト入力ページ</h1>
+
+<div>
+    <a href="index.html" class="btn">メインメニューに戻る</a>
+</div>
+
+<div style="text-align:center; margin-top:20px;">
+        <a href="shift.html"
+           style="padding:10px 20px; background:#2196F3; color:white; text-decoration:none; border-radius:5px;">
+            シフト作成ページにもどる
+        </a>
+    </div>
+    <br>
+
+<hr>
+
+<h2>従業員と日付の選択</h2>
+
+<label>従業員：
+<select id="prefEmployeeSelector">
+    <option value="">--- 従業員を選択 ---</option>
+</select>
+</label>
+
+<label>日付：
+<input type="date" id="prefDateInput">
+</label>
+
+<hr>
+
+<h2>出勤可能時間帯</h2>
+
+<div>
+    <label><input class="pref-check" type="checkbox" data-shift="TOP"> トップ</label>
+    <label><input class="pref-check" type="checkbox" data-shift="LUNCH"> ランチ</label>
+    <label><input class="pref-check" type="checkbox" data-shift="IDLE"> アイドル</label>
+    <label><input class="pref-check" type="checkbox" data-shift="DINNER"> ディナー</label>
+    <label><input class="pref-check" type="checkbox" data-shift="LAST"> ラスト</label>
+</div>
+
+<button id="prefSaveButton">希望を保存</button>
+<div id="prefMessage"></div>
+
+<hr>
+
+<h2>保存済みの希望一覧</h2>
+
+<div>
+    <button id="loadHistoryBtn">希望履歴を読み込む</button>
+    <ul id="preferenceHistoryList"></ul>
+</div>
+
+</body>
+</html>
