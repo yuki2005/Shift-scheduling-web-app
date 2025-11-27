@@ -25,11 +25,11 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
 		}*/
 
 		
-        // 1. Employee ID をキーとする ShiftPreference の Map を作成 (高速検索のため)
+        // Employee ID をキーとする ShiftPreference の Map を作成 (高速検索のため)
         Map<Integer, ShiftPreference> preferenceMap = shiftPreferences.stream()
                 .collect(Collectors.toMap(p -> p.getEmployee().getId(), p -> p));
                 
-        // 2. 🔴 フィルタリング: targetTimes の制約を満たす従業員のみ残す
+        // フィルタリング: targetTimes の制約を満たす従業員のみ残す
         List<Employee> viableStaff = ableStaff.stream()
                 .filter(employee -> {
                     ShiftPreference pref = preferenceMap.get(employee.getId());
@@ -57,24 +57,24 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
             System.out.println("⚠️ どの従業員も targetTimes に対応できませんでした。");
         }
 
-        // 3. スキル合計値の計算 (フィルタリング後の viableStaff を使用)
+        // スキル合計値の計算 (フィルタリング後の viableStaff を使用)
 		Map<Employee, Integer> allSkills = allSkill(viableStaff); 
 		
 		List<Employee> sortedStaffs = new ArrayList<>(getSortedSkillList(allSkills));
 		
-		// Schedule から必要なポジションの合計人数を取得
-        // PosAssign が時間帯ごとに呼び出すため、ここでは全時間帯の合計ではなく、
-        // 渡された targetTimes に対応する時間帯の合計人数を参照すべきだが、
-        // PosAssign は単一の時間帯で呼び出すため、全時間帯の合計を求めます。
-        // （ロジックを簡潔にするため、今回は全時間帯の合計人数を目標値とする）
-		int requiredCount = conditions.getRequiredCountsByTime().values().stream()
-                .flatMap(m -> m.values().stream())
-                .mapToInt(Integer::intValue)
-                .sum();
+		// targetTimes は基本1つの時間帯が入る想定
+		ShiftTime target = targetTimes.get(0);
+
+		// その時間帯だけの必要人数合計
+		int requiredCount = conditions.getRequiredCountsByTime()
+		        .getOrDefault(target, Map.of())
+		        .values().stream()
+		        .mapToInt(Integer::intValue)
+		        .sum();
 		
 		int actualCount = Math.min(requiredCount, sortedStaffs.size());
 		
-		// 5. 能力値の高い順に選定
+		// 能力値の高い順に選定
 		List<Employee> result = new ArrayList<>();
 		for(int i = 0; i < actualCount; i++) {
 			result.add(sortedStaffs.get(i));
