@@ -1,69 +1,121 @@
 package Position.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import Position.entity.FinalShiftRecordEntity;
+import Position.entity.FinalShiftRecordAssignmentEntity;
 import Position.repository.FinalShiftRecordRepository;
+import Position.repository.FinalShiftRecordAssignmentRepository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class FinalShiftRecordService {
 
-    private final FinalShiftRecordRepository repository;
-    private final ObjectMapper objectMapper;
+    private final FinalShiftRecordRepository recordRepo;
+    private final FinalShiftRecordAssignmentRepository assignRepo;
+    
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public FinalShiftRecordService(FinalShiftRecordRepository repository) {
-        this.repository = repository;
-        this.objectMapper = new ObjectMapper();
+    public FinalShiftRecordService(
+            FinalShiftRecordRepository recordRepo,
+            FinalShiftRecordAssignmentRepository assignRepo
+    ) {
+        this.recordRepo = recordRepo;
+        this.assignRepo = assignRepo;
     }
 
     /**
-     * フロントから送られてきた ShiftResponse 相当の JSON
-     * （date, dayOfWeek, isHoliday, message, finalAssignment, workingStaff ...）
-     * をそのまま Map で受け取り、必要な情報を DB に保存する。
+     * フロントからの "Assign結果(JSON)" を保存する
      */
-    public FinalShiftRecordEntity saveShift(Map<String, Object> rawJson) {
-        try {
-            // --- 基本情報の取り出し ---
-            String dateStr = (String) rawJson.get("date");
-            String dayOfWeek = (String) rawJson.get("dayOfWeek");
-            Object holidayObj = rawJson.get("isHoliday");
-            Boolean isHoliday = (holidayObj instanceof Boolean) ? (Boolean) holidayObj : Boolean.FALSE;
-            String message = (String) rawJson.getOrDefault("message", "");
+    @SuppressWarnings("unchecked")
+    public FinalShiftRecordEntity saveShift(Map<String, Object> rawJson, boolean overwrite) {
 
-            if (dateStr == null || dateStr.isBlank()) {
-                dateStr = LocalDate.now().toString();
-            }
+        // ===== 1) ヘッダ情報 =====
+        LocalDate date = LocalDate.parse((String) rawJson.get("date"));
+        
+        // ===== 上書き判定 =====
+        boolean exists = recordRepo.existsByDate(date);
 
-            // --- エンティティ生成 ---
-            FinalShiftRecordEntity entity = new FinalShiftRecordEntity();
-            entity.setDate(LocalDate.parse(dateStr));
-            entity.setDayOfWeek(dayOfWeek);
-            entity.setHoliday(isHoliday);
-            entity.setMessage(message);
-
-            // --- ネストされた構造は JSON 文字列に変換して保存 ---
-            Object finalAssignmentObj = rawJson.get("finalAssignment");
-            Object workingStaffObj = rawJson.get("workingStaff");
-
-            entity.setFinalAssignmentJson(
-                    objectMapper.writeValueAsString(finalAssignmentObj)
-            );
-            entity.setWorkingStaffJson(
-                    objectMapper.writeValueAsString(workingStaffObj)
-            );
-
-            return repository.save(entity);
-
-        } catch (Exception e) {
-            throw new RuntimeException("シフト保存中にエラー発生: " + e.getMessage(), e);
+        if (exists && !overwrite) {
+            throw new IllegalStateException("既に保存されているため、上書きが必要です。");
         }
+        
+        String dayOfWeek =
+                rawJson.containsKey("dayOfWeek") ? 
+                    (String) rawJson.get("dayOfWeek") :
+                    (String) rawJson.get("dayOfWeekString");
+        Boolean holidayObj = (Boolean) rawJson.get("isHoliday");
+        boolean isHoliday = holidayObj != null ? holidayObj : false;
+
+        String message = (String) rawJson.getOrDefault("message", "");
+
+        FinalShiftRecordEntity record = new FinalShiftRecordEntity();
+        record.setDate(date);
+        record.setDayOfWeek(dayOfWeek);
+        record.setHoliday(isHoliday);
+        record.setMessage(message);
+        
+        // ========= 🔥 JSON を丸ごと保存（履歴用） =========
+        try {
+            record.setFinalAssignmentJson(
+                    mapper.writeValueAsString(rawJson.get("finalAssignment"))
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("JSON 保存エラー", e);
+        }
+        
+        record = recordRepo.save(record);
+
+        // ===== 2) 明細（finalAssignment）保存 =====
+        Map<String, Object> finalAssignmentObj =
+                (Map<String, Object>) rawJson.get("finalAssignment");
+
+        for (Map.Entry<String, Object> entry : finalAssignmentObj.entrySet()) {
+            String shiftTime = entry.getKey();
+            Map<String, Object> posMap = (Map<String, Object>) entry.getValue();
+
+            for (Map.Entry<String, Object> posEntry : posMap.entrySet()) {
+                String posCode = posEntry.getKey();
+                List<Object> staffList = (List<Object>) posEntry.getValue();
+
+                for (Object o : staffList) {
+                    Map<String, Object> staff = (Map<String, Object>) o;
+                    Integer employeeNumber = (Integer) staff.get("id");
+
+                    FinalShiftRecordAssignmentEntity a = new FinalShiftRecordAssignmentEntity();
+                    a.setRecord(record);
+                    a.setShiftTime(shiftTime);
+                    a.setPosCode(posCode);
+                    a.setEmployeeNumber(employeeNumber);
+
+                    assignRepo.save(a);
+                }
+            }
+        }
+
+        return record;
     }
 
+    /**
+     * 全履歴を日付降順で取得
+     */
     public List<FinalShiftRecordEntity> findAll() {
-        return repository.findAll();
+        return recordRepo.findAllByOrderByDateDesc();
     }
+
+    public List<FinalShiftRecordEntity> findByDate(LocalDate date) {
+        return recordRepo.findByDate(date);
+    }
+    
+    public boolean exists(LocalDate date) {
+        return recordRepo.existsByDate(date);
+    }
+
 }

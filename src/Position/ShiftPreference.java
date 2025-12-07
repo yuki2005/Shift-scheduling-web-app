@@ -17,7 +17,7 @@ public class ShiftPreference {
 	private final Map<ShiftTime, Integer> availabilityMap;
 	
 	//コンストラクタ
-	public static ShiftPreference fromStringMap(Employee employee, Map<String, Integer> initialAvailabilityMap, String dateString) {
+	public static ShiftPreference fromStringMap(Employee employee, Map<String, Integer> initialAvailabilityMap, LocalDate date) {
 		
 		if (initialAvailabilityMap == null) {
 	        initialAvailabilityMap = new HashMap<>();
@@ -34,7 +34,6 @@ public class ShiftPreference {
             }
         }
         
-        LocalDate date = LocalDate.parse(dateString);
      /* 🟡 デバッグ出力追加
         System.out.println("[DEBUG] ShiftPreference created for " + employee.getName() + ": " + converted);
         */
@@ -43,7 +42,7 @@ public class ShiftPreference {
 	
 	public ShiftPreference(Employee employee, Map<ShiftTime, Integer> availabilityMap, LocalDate date) {
         this.employee = employee;
-        this.availabilityMap = availabilityMap;
+        this.availabilityMap = Collections.unmodifiableMap(new EnumMap<>(availabilityMap));
         this.date = date;
     }
 	

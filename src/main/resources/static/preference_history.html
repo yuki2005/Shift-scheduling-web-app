@@ -1,0 +1,67 @@
+<!--preference_history.html-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>希望シフト履歴</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="./preference_history.js"></script>
+</head>
+<body>
+
+<h1>希望シフト履歴</h1>
+
+<div>
+	<a href="shift.html"
+		style="padding:15px 30px; background:#4CAF50; color:white; 
+	    text-decoration:none; border-radius:8px; display:block; 
+	    width:250px; margin:10px auto;">
+	    シフトを作成ページに戻る
+	 </a>
+	 
+	 <a href="shift_preference.html"
+	    style="padding:15px 30px; background:#4CAF50; color:white; 
+	         text-decoration:none; border-radius:8px; display:block; 
+	         width:250px; margin:10px auto;">
+	      希望シフト入力画面に戻る
+	 </a>
+	 
+	 <a href="index.html"
+	     style="padding:15px 30px; background:#4CAF50; color:white; 
+	     	text-decoration:none; border-radius:8px; display:block; 
+	         width:250px; margin:10px auto;">
+	      メインメニューに戻る
+	  </a>
+	 
+</div>
+
+<hr>
+
+<h2>日付を選択</h2>
+<label>
+    日付：
+    <input type="date" id="historyDate">
+</label>
+<button id="loadPrefByDateBtn">この日の希望を読み込む</button>
+
+<hr>
+
+<h2>この日の希望シフト一覧</h2>
+
+<table border="1" style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th>従業員</th>
+            <th>TOP</th>
+            <th>LUNCH</th>
+            <th>IDLE</th>
+            <th>DINNER</th>
+            <th>LAST</th>
+        </tr>
+    </thead>
+    <tbody id="prefHistoryBody"></tbody>
+</table>
+
+</body>
+</html>

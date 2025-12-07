@@ -1,5 +1,6 @@
 package Position;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import Position.Employee;
@@ -21,7 +22,7 @@ public class ShiftResponse {
     private String message;
     
     // 4. 日付
-    private String date;
+    private LocalDate date;
     
     // 5. 曜日
     private String dayOfWeek;
@@ -31,7 +32,7 @@ public class ShiftResponse {
     
     //コンストラクタ
     public ShiftResponse(Map<ShiftTime, Map<Pos, List<Employee>>> finalAssignment, Map<ShiftTime, List<Employee>> workingStaff, String message,
-    		String date, String dayOfWeek, boolean holiday) {
+    		LocalDate date, String dayOfWeek, boolean holiday) {
         this.finalAssignment = finalAssignment;
         this.workingStaff = workingStaff;
         this.message = message;
@@ -60,10 +61,10 @@ public class ShiftResponse {
     	this.message = message;
     }
     
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

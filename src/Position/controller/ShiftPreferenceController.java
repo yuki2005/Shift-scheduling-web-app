@@ -1,59 +1,92 @@
 package Position.controller;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import Position.ShiftPreference;
 import Position.ShiftPreferenceDto;
+import Position.ShiftPreference;
+import Position.Employee;
 import Position.service.ShiftPreferenceService;
 import Position.service.EmployeeService;
-import Position.Employee;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/preferences")
 public class ShiftPreferenceController {
 
-    private final ShiftPreferenceService service;
-    private final EmployeeService employeeService; // ← 追加
+    private final ShiftPreferenceService prefService;
+    private final EmployeeService employeeService;
 
     public ShiftPreferenceController(
-            ShiftPreferenceService service,
-            EmployeeService employeeService   // ← 追加
+            ShiftPreferenceService prefService,
+            EmployeeService employeeService
     ) {
-        this.service = service;
-        this.employeeService = employeeService; // ← 追加
+        this.prefService = prefService;
+        this.employeeService = employeeService;
     }
 
-    // 1件保存
+    /**
+     * POST /api/preferences
+     * 希望シフトの保存
+     */
     @PostMapping
-    public ShiftPreference save(@RequestBody ShiftPreferenceDto dto) {
+    public  ResponseEntity<String> save(@RequestBody ShiftPreferenceDto dto) {
 
-        // 🔥 DBから従業員を取得（ここが今回の修正ポイント）
         Employee emp = employeeService.findByEmployeeNumber(dto.getEmployeeId());
 
-        ShiftPreference pref = ShiftPreference.fromStringMap(
+        ShiftPreference pref = new ShiftPreference(
                 emp,
-                dto.getAvailabilityMap(),
-                dto.getDate().toString()
+                dto.getAvailabilityMap().entrySet().stream()
+                        .collect(Collectors.toMap(
+                                e -> Position.ShiftTime.valueOf(e.getKey()),
+                                Map.Entry::getValue
+                        )),
+                dto.getDate()
         );
 
-        return service.save(pref);
+        prefService.savePreference(pref);
+        return ResponseEntity.status(HttpStatus.CREATED).body("saved");
+    }
+
+    @GetMapping("/{employeeNumber}/{date}")
+    public ShiftPreference getOne(
+            @PathVariable int employeeNumber,
+            @PathVariable String date
+    ) {
+        return prefService.findOne(employeeNumber, LocalDate.parse(date));
     }
 
     @GetMapping("/employee/{employeeNumber}")
     public List<ShiftPreference> getByEmployee(@PathVariable int employeeNumber) {
-        return service.findByEmployeeNumber(employeeNumber);
+        return prefService.findByEmployeeNumber(employeeNumber);
     }
 
     @GetMapping("/date/{date}")
     public List<ShiftPreference> getByDate(@PathVariable String date) {
-        return service.findByDate(LocalDate.parse(date));
+        LocalDate d = LocalDate.parse(date);
+        List<ShiftPreference> list = prefService.findByDate(d);
+
+        // employee_number から Employee を紐付ける
+        return list.stream()
+            .map(pref -> {
+                Employee emp = employeeService.findByEmployeeNumber(pref.getEmployee().getId());
+                return new ShiftPreference(
+                        emp,
+                        pref.getAvailabilityMap(),
+                        pref.getDate()
+                );
+            })
+            .collect(Collectors.toList());
     }
 
-    @GetMapping("/{employeeNumber}/{date}")
-    public ShiftPreference getOne(@PathVariable int employeeNumber, @PathVariable String date) {
-        return service.findOne(employeeNumber, LocalDate.parse(date));
+    
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handle(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
 }

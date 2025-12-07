@@ -2,6 +2,7 @@ package Position.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "final_shift_record")
@@ -20,15 +21,14 @@ public class FinalShiftRecordEntity {
     // 休日フラグ
     private boolean holiday;
 
-    // 最終的な割り当て結果（JSON文字列）
-    @Lob
+    @OneToMany(mappedBy = "record", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FinalShiftRecordAssignmentEntity> assignments;
+    
+    @Column(columnDefinition = "TEXT")
     private String finalAssignmentJson;
-
-    // 実際に選出された従業員（JSON）
-    @Lob
-    private String workingStaffJson;
-
+    
     // メッセージ（DBにも残す）
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     public FinalShiftRecordEntity() {}
@@ -47,18 +47,19 @@ public class FinalShiftRecordEntity {
     public boolean isHoliday() { return holiday; }
     public void setHoliday(boolean holiday) { this.holiday = holiday; }
 
-    public String getFinalAssignmentJson() { return finalAssignmentJson; }
-    public void setFinalAssignmentJson(String finalAssignmentJson) {
-        this.finalAssignmentJson = finalAssignmentJson;
-    }
-
-    public String getWorkingStaffJson() { return workingStaffJson; }
-    public void setWorkingStaffJson(String workingStaffJson) {
-        this.workingStaffJson = workingStaffJson;
-    }
-
     public String getMessage() { return message; }
     public void setMessage(String message) {
         this.message = message;
     }
+    
+    public List<FinalShiftRecordAssignmentEntity> getAssignments() {
+        return assignments;
+    }
+    public void setAssignments(List<FinalShiftRecordAssignmentEntity> assignments) {
+        this.assignments = assignments;
+    }
+    
+    public String getFinalAssignmentJson() { return finalAssignmentJson; }
+    public void setFinalAssignmentJson(String json) { this.finalAssignmentJson = json; }
+
 }

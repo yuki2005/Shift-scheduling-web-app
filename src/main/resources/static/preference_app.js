@@ -89,7 +89,7 @@ async function loadPreference() {
         applyCheckboxes(map);
 
         employeePreferences[empId] = {
-            employeeId: empId,
+            employee : { id: parseInt(empId) },
             date,
             availabilityMap: map
         };
@@ -175,3 +175,16 @@ async function savePreference() {
         message.textContent = "保存に失敗しました。";
     }
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadEmployees();      
+    setupEvents();              
+
+    // ★ 履歴ボタン押下で別ページへ遷移
+    const historyBtn = document.getElementById("loadHistoryBtn");
+    if (historyBtn) {
+        historyBtn.addEventListener("click", () => {
+            window.location.href = "preference_history.html";
+        });
+    }
+});

@@ -7,7 +7,6 @@
 </head>
 
 <body>
-    <script type="module" src="./app.js"></script>
 
     <div id="header">
         <h1>シフト自動割り当てシステム</h1>
@@ -52,21 +51,11 @@
         <h2>--- シフト条件入力フォーム ---</h2>
 
         <p>シフト対象日</p>
-        <input type="date" id="shiftDateInput">
+        <input type="date" id="shiftDateInput" name = "shiftDate">
         <br>
+		
+		<p id="autoDetectedDay" style="color:blue;"></p>
 
-        <p>何曜日ですか？</p>
-        <select name="dayOfWeekString">
-            <option value="" disabled selected>--- 曜日を選択 ---</option>
-            <option value="MON">月曜日</option>
-            <option value="TUE">火曜日</option>
-            <option value="WED">水曜日</option>
-            <option value="THR">木曜日</option>
-            <option value="FRI">金曜日</option>
-            <option value="SAT">土曜日</option>
-            <option value="SUN">日曜日</option>
-        </select>
-        <br>
 
         <p>休日ですか？</p>
         <div class="radio-group">
@@ -78,50 +67,47 @@
         <h2>--- 従業員一覧（DBから自動ロード） ---</h2>
         <p style="color:gray;">※従業員の編集は「従業員データ編集」ページから行ってください</p>
 
-        <table id="employeeTable" border="1">
-            <thead>
-                <tr>
-					<th></th>
-                    <th>社員番号</th>
-                    <th>名前</th>
-                    <th>デシャップ(D)</th>
-                    <th>焼(Y)</th>
-                    <th>揚(A)</th>
-                    <th>板(I)</th>
-                    <th>麺(IF)</th>
-                    <th>全体フォロー(AF)</th>
-                    <th>洗(W)</th>
-                </tr>
-            </thead>
-            <tbody id="employeeInputBody">
-                <!-- DBから読み込み -->
-            </tbody>
-        </table>
+		<!-- 従業員一覧（閲覧専用） -->
+		<table id="employeeTable" border="1">
+		    <thead>
+		        <tr>
+		            <th>社員番号</th>
+		            <th>名前</th>
+		            <th>デシャップ(D)</th>
+		            <th>焼(Y)</th>
+		            <th>揚(A)</th>
+		            <th>板(I)</th>
+		            <th>麺(IF)</th>
+		            <th>全体フォロー(AF)</th>
+		            <th>洗(W)</th>
+		        </tr>
+		    </thead>
+		    <tbody id="employeeInputBody"></tbody>
+		</table>
+
     </div>
 
-    <!-- ==================================================
-         希望シフト入力フォーム
-    ================================================== -->
-    <div id="preference-section">
-        <h2>--- 希望シフトの入力 ---</h2>
+	<button id="loadPrefsForShiftButton"
+	        style="padding:10px; margin-top:10px;">
+	    この日の希望を読み込む
+	</button>
 
-        <p>希望を提出する従業員を選択してください</p>
-        <select id="employeePreferenceSelector">
-            <!-- DBロード後にJSで追加 -->
-        </select>
+	<div id="loadedPrefMessage" style="margin-top:10px; color:blue;"></div>
 
-        <p>出勤可能な時間帯（チェック：可）</p>
-        <div class="shift-time-group">
-            <label><input type="checkbox" data-shift="TOP"> トップ</label>
-            <label><input type="checkbox" data-shift="LUNCH"> ランチ</label>
-            <label><input type="checkbox" data-shift="IDLE"> アイドル</label>
-            <label><input type="checkbox" data-shift="DINNER"> ディナー</label>
-            <label><input type="checkbox" data-shift="LAST"> ラスト</label>
-        </div>
+	<table id="prefViewTable" border="1" style="margin-top:10px; display:none;">
+	    <thead>
+	        <tr>
+	            <th>従業員</th>
+	            <th>TOP</th>
+	            <th>LUNCH</th>
+	            <th>IDLE</th>
+	            <th>DINNER</th>
+	            <th>LAST</th>
+	        </tr>
+	    </thead>
+	    <tbody id="prefViewBody"></tbody>
+	</table>
 
-        <button id="savePreferenceButton">この従業員の希望を保存</button>
-        <div id="preferenceMessage"></div>
-    </div>
 
     <!-- ==================================================
          実行ボタン
@@ -163,6 +149,8 @@
 
         <div id="saveResultMessage" style="margin-top:10px; color:green;"></div>
     </div>
+	
+	<script type="module" src="./app.js"></script>
 
 </body>
 </html>
