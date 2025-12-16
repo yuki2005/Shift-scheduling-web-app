@@ -39,7 +39,7 @@ async function loadHistory() {
     }
 }
 
-//日付で検索
+// 日付で検索
 async function searchHistoryByDate() {
     const dateInput = document.getElementById("searchDateInput");
     const date = dateInput.value;
@@ -86,35 +86,64 @@ async function searchHistoryByDate() {
 
 // 詳細表示
 function showDetail(record) {
-    const detailArea = document.getElementById("detailView");
-	
-	let assignmentPretty = "";
-	let workingPretty = "";
+    document.getElementById("detailTitle").textContent =
+        `${record.date}（${record.dayOfWeek}） ${record.holiday ? "祝日" : "通常"}`;
 
-	try {
-        assignmentPretty = JSON.stringify(JSON.parse(record.finalAssignmentJson), null, 2);
-	} catch (e) {
-        // JSON が壊れている場合はそのまま表示
-        assignmentPretty = record.finalAssignmentJson;
+    const container = document.getElementById("assignmentTables");
+    container.innerHTML = "";
+
+    if (!record.finalAssignmentJson) {
+        container.textContent = "割り当てデータなし";
+        return;
     }
-	
-    const formatted = `
-■ 日付: ${record.date}
-■ 曜日: ${record.dayOfWeek}
-■ 休日: ${record.holiday ? "はい" : "いいえ"}
-■ メッセージ: ${record.message}
 
-■ 最終割り当て結果:
-${record.finalAssignmentJson}
+    const assignment = record.finalAssignmentJson; // ← @JsonRawValue により既に Object
 
-    detailArea.textContent = formatted;
+    for (const [time, posMap] of Object.entries(assignment)) {
+        // 時間帯タイトル
+        const h4 = document.createElement("h4");
+        h4.textContent = `【${time}】`;
+        container.appendChild(h4);
+
+        // テーブル作成
+        const table = document.createElement("table");
+        table.className = "assignment-table";
+
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>ポジション</th>
+                    <th>担当者</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector("tbody");
+
+        for (const [pos, staffList] of Object.entries(posMap)) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${pos}</td>
+                <td>${
+                    staffList.length > 0
+                        ? staffList.map(s => s.name).join(", ")
+                        : "―"
+                }</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        container.appendChild(table);
+    }
 }
+
 
 // 初期設定
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("loadHistoryButton")
-            .addEventListener("click", loadHistory);
+        .addEventListener("click", loadHistory);
 
     document.getElementById("searchButton")
-            .addEventListener("click", searchHistoryByDate);
+        .addEventListener("click", searchHistoryByDate);
 });

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 @Entity
 @Table(name = "final_shift_record")
 public class FinalShiftRecordEntity {
@@ -24,6 +26,7 @@ public class FinalShiftRecordEntity {
     @OneToMany(mappedBy = "record", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FinalShiftRecordAssignmentEntity> assignments;
     
+    @JsonRawValue
     @Column(columnDefinition = "TEXT")
     private String finalAssignmentJson;
     

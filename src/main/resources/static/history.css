@@ -1,0 +1,15 @@
+.assignment-table {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.assignment-table th,
+.assignment-table td {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+}
+
+.assignment-table th {
+    background-color: #f0f0f0;
+}

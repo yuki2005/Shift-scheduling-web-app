@@ -223,7 +223,7 @@ async function saveCurrentShift() {
         return;
     }
 
-    // 1️⃣ 保存する日付を取得
+    // ① 日付・曜日・祝日を再取得（←超重要）
     const date = document.getElementById("shiftDateInput").value;
     if (!date) {
         msg.style.color = "red";
@@ -231,46 +231,73 @@ async function saveCurrentShift() {
         return;
     }
 
-    // 2️⃣ まず日付が既に存在するかチェック
-    const existsRes = await fetch(`http://localhost:8080/api/shift-records/exists/${date}`);
-    const existsJson = await existsRes.json();
+    const dayOfWeekString = getDayOfWeekString(date);
+    const selectedHoliday =
+        document.querySelector('input[name="isHoliday"]:checked');
 
-    let overwrite = false;
-
-    if (existsJson.exists) {
-        // 3️⃣ 上書き確認ダイアログ
-        const ok = confirm(`${date} のシフトは既に保存されています。\n上書きしてよいですか？`);
-
-        if (!ok) {
-            msg.style.color = "red";
-            msg.textContent = "保存をキャンセルしました。";
-            return;
-        }
-
-        overwrite = true;
+    if (!selectedHoliday) {
+        msg.style.color = "red";
+        msg.textContent = "祝日情報が不明です。";
+        return;
     }
 
-    // 4️⃣ 保存リクエスト送信
+    const isHoliday = selectedHoliday.value === "true";
+
+    // ② 既存チェック
+    let overwrite = false;
+    try {
+        const existsRes = await fetch(
+            `http://localhost:8080/api/shift-records/exists/${date}`
+        );
+        const existsJson = await existsRes.json();
+
+        if (existsJson.exists) {
+            const ok = confirm(
+                `${date} のシフトは既に保存されています。\n上書きしてよいですか？`
+            );
+            if (!ok) {
+                msg.style.color = "red";
+                msg.textContent = "保存をキャンセルしました。";
+                return;
+            }
+            overwrite = true;
+        }
+    } catch (e) {
+        console.error(e);
+        msg.style.color = "red";
+        msg.textContent = "保存前チェックに失敗しました。";
+        return;
+    }
+
+    // ③ 保存API用 payload（★重要）
     const body = {
-        ...latestShiftResponse,
+        date: date,
+        dayOfWeekString: dayOfWeekString,
+        isHoliday: isHoliday,
+        message: latestShiftResponse.message ?? "",
+        finalAssignment: latestShiftResponse.finalAssignment,
         overwrite: overwrite
     };
 
+    // ④ 保存
     try {
-        const response = await fetch("http://localhost:8080/api/shift-records/save", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        });
+        const response = await fetch(
+            "http://localhost:8080/api/shift-records/save",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            }
+        );
 
         if (!response.ok) {
-            msg.style.color = "red";
-            msg.textContent = "保存に失敗しました（サーバーエラー）。";
             throw new Error(`Save Error: ${response.status}`);
         }
 
         msg.style.color = "green";
-        msg.textContent = "シフトを保存しました！";
+        msg.textContent = overwrite
+            ? "シフトを上書き保存しました！"
+            : "シフトを保存しました！";
 
         console.log("保存成功:", await response.text());
 
@@ -280,6 +307,7 @@ async function saveCurrentShift() {
         msg.textContent = "保存に失敗しました（通信エラー）。";
     }
 }
+
 
 
 // ==============================

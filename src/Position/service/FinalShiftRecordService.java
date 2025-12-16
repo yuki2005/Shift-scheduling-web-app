@@ -43,8 +43,11 @@ public class FinalShiftRecordService {
         // ===== 上書き判定 =====
         boolean exists = recordRepo.existsByDate(date);
 
-        if (exists && !overwrite) {
-            throw new IllegalStateException("既に保存されているため、上書きが必要です。");
+        if (exists) {
+            if (!overwrite) {
+                throw new IllegalStateException("既に保存されているため、上書きが必要です。");
+            }
+            recordRepo.deleteByDate(date);
         }
         
         String dayOfWeek =
@@ -62,21 +65,29 @@ public class FinalShiftRecordService {
         record.setHoliday(isHoliday);
         record.setMessage(message);
         
-        // ========= 🔥 JSON を丸ごと保存（履歴用） =========
+     // ===== finalAssignment を Map として取得（明細用）=====
+        Object finalAssignmentRaw = rawJson.get("finalAssignment");
+
+        if (!(finalAssignmentRaw instanceof Map)) {
+            throw new IllegalArgumentException("finalAssignment が不正です");
+        }
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> finalAssignmentObj =
+                (Map<String, Object>) finalAssignmentRaw;
+
+        // ===== JSON保存（履歴用）=====
         try {
             record.setFinalAssignmentJson(
-                    mapper.writeValueAsString(rawJson.get("finalAssignment"))
+                mapper.writeValueAsString(finalAssignmentObj)
             );
         } catch (Exception e) {
             throw new RuntimeException("JSON 保存エラー", e);
         }
         
         record = recordRepo.save(record);
-
-        // ===== 2) 明細（finalAssignment）保存 =====
-        Map<String, Object> finalAssignmentObj =
-                (Map<String, Object>) rawJson.get("finalAssignment");
-
+        
+     // ===== 明細保存 =====
         for (Map.Entry<String, Object> entry : finalAssignmentObj.entrySet()) {
             String shiftTime = entry.getKey();
             Map<String, Object> posMap = (Map<String, Object>) entry.getValue();
@@ -89,7 +100,8 @@ public class FinalShiftRecordService {
                     Map<String, Object> staff = (Map<String, Object>) o;
                     Integer employeeNumber = (Integer) staff.get("id");
 
-                    FinalShiftRecordAssignmentEntity a = new FinalShiftRecordAssignmentEntity();
+                    FinalShiftRecordAssignmentEntity a =
+                        new FinalShiftRecordAssignmentEntity();
                     a.setRecord(record);
                     a.setShiftTime(shiftTime);
                     a.setPosCode(posCode);
