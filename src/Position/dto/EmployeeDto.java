@@ -1,7 +1,10 @@
-package Position;
+package Position.dto;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import Position.Employee;
+import Position.Pos;
 
 public class EmployeeDto {
 

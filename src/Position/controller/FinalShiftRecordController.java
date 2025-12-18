@@ -3,7 +3,9 @@ package Position.controller;
 import org.springframework.web.bind.annotation.*;
 
 import Position.FinalShiftRecordSaveRequest;
+import Position.dto.FinalShiftRecordDto;
 import Position.entity.FinalShiftRecordEntity;
+import Position.mapper.FinalShiftRecordMapper;
 import Position.service.FinalShiftRecordService;
 
 import java.time.LocalDate;
@@ -22,7 +24,7 @@ public class FinalShiftRecordController {
     }
 
     @PostMapping
-    public FinalShiftRecordEntity save(@RequestBody FinalShiftRecordSaveRequest dto) {
+    public FinalShiftRecordDto save(@RequestBody FinalShiftRecordSaveRequest dto) {
     	Map<String, Object> map = new HashMap<>();
     	map.put("date", dto.getDate());
     	map.put("dayOfWeek", dto.getDayOfWeek());
@@ -30,7 +32,10 @@ public class FinalShiftRecordController {
     	map.put("message", dto.getMessage());
     	map.put("finalAssignment", dto.getFinalAssignment());
 
-    	return recordService.saveShift(map, false);
+    	FinalShiftRecordEntity saved =
+                recordService.saveShift(map, false);
+
+        return FinalShiftRecordMapper.toDto(saved);
 
     }
     
@@ -43,23 +48,31 @@ public class FinalShiftRecordController {
     }
 
     @GetMapping("/all")
-    public List<FinalShiftRecordEntity> getAll() {
-        return recordService.findAll();
+    public List<FinalShiftRecordDto> getAll() {
+    	return recordService.findAll().stream()
+                .map(FinalShiftRecordMapper::toDto)
+                .toList();
     }
     
     @GetMapping("/{date}")
-    public FinalShiftRecordEntity getByDate(@PathVariable String date) {
-        return recordService.findAll().stream()
-                .filter(r -> r.getDate().toString().equals(date))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("指定された日のシフトは存在しません: " + date));
+    public FinalShiftRecordDto getByDate(@PathVariable String date) {
+        FinalShiftRecordEntity record = recordService.findByDate(
+                LocalDate.parse(date)
+        ).stream().findFirst()
+         .orElseThrow(() -> new RuntimeException("存在しません"));
+
+        return FinalShiftRecordMapper.toDto(record);
     }
 
+
     @GetMapping("/search")
-    public List<FinalShiftRecordEntity> searchByDate(@RequestParam String date) {
+    public List<FinalShiftRecordDto> searchByDate(@RequestParam String date) {
         LocalDate target = LocalDate.parse(date);
-        return recordService.findByDate(target);
+        return recordService.findByDate(target).stream()
+                .map(FinalShiftRecordMapper::toDto)
+                .toList();
     }
+
     
     @GetMapping("/exists/{date}")
     public Map<String, Boolean> exists(@PathVariable String date) {

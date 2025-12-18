@@ -28,7 +28,6 @@ public class FinalShiftRecordEntity {
     @JsonIgnore
     private List<FinalShiftRecordAssignmentEntity> assignments;
     
-    @JsonRawValue
     @Column(columnDefinition = "TEXT")
     private String finalAssignmentJson;
     

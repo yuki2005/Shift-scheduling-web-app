@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import Position.dto.EmployeeDto;
+import Position.dto.ShiftPreferenceDto;
+
 /**
  * シフト自動割当 API(/api/shift/assign) の受け口となる DTO。
  * フロントから送られてきた JSON を Domain Model へ変換する役割。
