@@ -66,5 +66,16 @@ public class FinalShiftRecordController {
         boolean exists = recordService.exists(LocalDate.parse(date));
         return Map.of("exists", exists);
     }
+    
+    // 修正保存
+    @PostMapping("/update")
+    public void update(@RequestBody Map<String, Object> body) {
+
+        Long recordId = Long.valueOf(body.get("recordId").toString());
+        Map<String, Object> finalAssignment =
+                (Map<String, Object>) body.get("finalAssignment");
+
+        recordService.updateShift(recordId, finalAssignment);
+    }
 
 }

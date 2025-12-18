@@ -114,6 +114,51 @@ public class FinalShiftRecordService {
 
         return record;
     }
+    
+    @SuppressWarnings("unchecked")
+    public void updateShift(Long recordId, Map<String, Object> finalAssignment) {
+
+        FinalShiftRecordEntity record = recordRepo.findById(recordId)
+                .orElseThrow(() -> new IllegalArgumentException("record not found"));
+
+        // ① JSON を保存（履歴用）
+        try {
+            record.setFinalAssignmentJson(
+                    mapper.writeValueAsString(finalAssignment)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("JSON変換失敗", e);
+        }
+
+        // ② 既存明細を削除
+        assignRepo.deleteByRecord(record);
+
+        // ③ 明細を再作成
+        for (Map.Entry<String, Object> timeEntry : finalAssignment.entrySet()) {
+            String shiftTime = timeEntry.getKey();
+            Map<String, Object> posMap =
+                    (Map<String, Object>) timeEntry.getValue();
+
+            for (Map.Entry<String, Object> posEntry : posMap.entrySet()) {
+                String posCode = posEntry.getKey();
+                List<Map<String, Object>> staffList =
+                        (List<Map<String, Object>>) posEntry.getValue();
+
+                for (Map<String, Object> staff : staffList) {
+                    Integer empId = (Integer) staff.get("id");
+
+                    FinalShiftRecordAssignmentEntity a =
+                            new FinalShiftRecordAssignmentEntity();
+                    a.setRecord(record);
+                    a.setShiftTime(shiftTime);
+                    a.setPosCode(posCode);
+                    a.setEmployeeNumber(empId);
+
+                    assignRepo.save(a);
+                }
+            }
+        }
+    }
 
     /**
      * 全履歴を日付降順で取得
