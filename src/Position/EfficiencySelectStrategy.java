@@ -15,15 +15,6 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
 	@Override
 	public List<Employee> selectStaff(List<Employee> ableStaff, Schedule conditions, 
                                       List<ShiftPreference> shiftPreferences, List<ShiftTime> targetTimes){
-		//デバッグ出力
-		/*
-		System.out.println("=== WorkingStaff selection start ===");
-		for (ShiftPreference pref : shiftPreferences) {
-			for(ShiftTime time : ShiftTime.values()) {
-				System.out.println(pref.getEmployee().getName() + " => " + pref.getAvailability(time));
-			}
-		}*/
-
 		
         // Employee ID をキーとする ShiftPreference の Map を作成 (高速検索のため)
         Map<Integer, ShiftPreference> preferenceMap = shiftPreferences.stream()

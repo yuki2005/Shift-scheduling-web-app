@@ -8,10 +8,14 @@ public class Schedule {
 	//各時間帯での各ポジションの必要最低人数を記録
 	private final Map<ShiftTime, Map<Pos, Integer>> requiredCountsByTime;
 	
+	private final boolean isHoliday;
+	
 	//コンストラクタ
 	public Schedule(DayOfWeek day, boolean isNationalHoLiday){
 		// 二次元マップをインスタンス化
 		this.requiredCountsByTime = new HashMap<>();
+		
+		this.isHoliday = isNationalHoLiday;
 		
 		// 1. ShiftTime の全時間帯に対してループ
 		for (ShiftTime time : ShiftTime.values()) {
@@ -61,5 +65,9 @@ public class Schedule {
 	 */
 	public Map<ShiftTime, Map<Pos, Integer>> getRequiredCountsByTime() {
 		return Collections.unmodifiableMap(requiredCountsByTime);
+	}
+	
+	public boolean isHoliday() {
+		return isHoliday;
 	}
 }
