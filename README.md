@@ -70,6 +70,52 @@
 Controller / Service / Repository の  
 **レイヤードアーキテクチャ**を採用しています。
 
+### ディレクトリ構成
+
+本プロジェクトは Maven / Spring Boot の標準構成に従い、
+`src/main/java` 配下に Java ソースを配置しています。
+
+Controller / Service / Repository を分離した
+レイヤードアーキテクチャを採用しており、
+スタッフ選定ロジックは Strategy パターンとして service 層に実装しています。
+
+```text
+src
+└─ main
+   ├─ java
+   │  └─ Position
+   │     ├─ controller
+   │     │  └─ ShiftAssignController.java
+   │     ├─ service
+   │     │  ├─ AutoShiftService.java
+   │     │  ├─ PosAssignService.java
+   │     │  └─ strategy
+   │     │     ├─ AssignmentStrategy.java
+   │     │     ├─ MaxSkillStrategy.java
+   │     │     └─ EfficiencySelectStrategy.java
+   │     ├─ repository
+   │     │  ├─ EmployeeRepository.java
+   │     │  └─ ShiftRecordRepository.java
+   │     ├─ entity
+   │     │  ├─ Employee.java
+   │     │  ├─ ShiftPreference.java
+   │     │  ├─ FinalShiftRecord.java
+   │     │  └─ FinalShiftRecordAssignment.java
+   │     ├─ dto
+   │     │  ├─ EmployeeDto.java
+   │     │  └─ ShiftResultDto.java
+   │     ├─ mapper
+   │     │  └─ ShiftMapper.java
+   │     └─ Main.java
+   └─ resources
+      ├─ static
+      └─ application.properties.example
+
+pom.xml
+README.md
+.gitignore
+```
+
 ---
 
 ## 6. データベース設計（ER図）
@@ -149,7 +195,55 @@ Controller / Service / Repository の
 
 ---
 
-## 11. AI（ChatGPT）の活用について
+## 11. 開発環境・ビルド設定に関する問題と解決
+
+### 背景
+
+開発初期段階では、Java のパッケージを src フォルダ直下に配置して開発を行っていました。
+その後、Maven / Spring Boot の標準構成に合わせるため、
+Java ソースを src/main/java 配下へ移動する対応を行いました。
+
+### 発生した問題
+
+- package 宣言とディレクトリ構成の不一致による大量のエラー表示
+- Source Folder の設定が正しく認識されない
+- IDE 上ではエラーが表示されるが、アプリケーション自体は起動・動作する状態
+- Maven Update を行うたびに Build Path が変化し、エラーが再発
+
+### 原因
+
+IDE の設定だけでなく、pom.xml を確認したところ、
+以下の設定が原因であることが分かりました。
+
+```xml
+<sourceDirectory>src</sourceDirectory>
+```
+
+
+
+この設定により、Maven が
+src/main/java ではなく src 全体を Java ソースディレクトリとして解釈しており、
+Eclipse（m2e）がプロジェクト更新時に Build Path を自動的に再構成することで、
+Source Folder の不整合が発生していました。
+
+### 対応
+
+- pom.xml から `<sourceDirectory>` 設定を削除
+- Java ソースを `src/main/java` 配下に統一
+- Maven Update Project を実行し、Build Path を再生成
+
+### 学び
+
+- Maven プロジェクトでは **標準ディレクトリ構成を前提に設計することが重要**
+- IDE 上のエラー表示と、実行時の挙動は必ずしも一致しない
+- 問題の原因は IDE 設定だけでなく、`pom.xml` にある場合がある
+
+この経験を通して、
+ビルドツール・IDE・実行環境の関係を意識して原因を切り分ける必要があることを学びました。
+
+---
+
+## 12. AI（ChatGPT）の活用について
 
 ### 活用した場面
 - エラーログ・JSONデータの解析
@@ -167,7 +261,7 @@ AIを **補助的なレビュー・相談相手**として活用しました。
 
 ---
 
-## 12. 今後の改善予定（Future Work）
+## 13. 今後の改善予定（Future Work）
 
 - UI / UX の改善
 - スタッフ選定アルゴリズムの高度化
@@ -177,7 +271,7 @@ AIを **補助的なレビュー・相談相手**として活用しました。
 
 ---
 
-## 13. 学び・振り返り
+## 14. 学び・振り返り
 
 - 設計の重要性（責務分離）
 - エラー対応力の向上
@@ -188,7 +282,7 @@ AIを **補助的なレビュー・相談相手**として活用しました。
 
 ---
 
-## 14. 作成者
+## 15. 作成者
 
 - 明治大学　理工学部　情報科学科　○○
 - 学年：2年
