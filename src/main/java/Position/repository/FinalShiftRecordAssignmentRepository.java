@@ -9,8 +9,11 @@ import Position.entity.*;
 
 @Repository
 public interface FinalShiftRecordAssignmentRepository extends JpaRepository<FinalShiftRecordAssignmentEntity, Long> {
+	
+	//シフト結果を取り出す
     List<FinalShiftRecordAssignmentEntity> findByRecordId(Long recordId);
     
+    //シフトを削除する
     void deleteByRecord(FinalShiftRecordEntity record);
     
 }

@@ -12,10 +12,10 @@ public class EmployeeEntity {
     private Long id;  // DB側では自動採番を想定（Employee.idとは別管理でもOK）
 
     @Column(nullable = false)
-    private String name;
+    private String name;	//名前
     
     @Column(nullable = false, unique = true)
-    private int employeeNumber;
+    private int employeeNumber;	   //社員番号
 
     // JSON文字列としてskillsを保存する
     @Column(columnDefinition = "TEXT")
@@ -52,7 +52,7 @@ public class EmployeeEntity {
         this.skillsJson = skillsJson;
     }
 
-    // --- equals / hashCode（JPA推奨） ---
+    // --- equals / hashCode ---
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

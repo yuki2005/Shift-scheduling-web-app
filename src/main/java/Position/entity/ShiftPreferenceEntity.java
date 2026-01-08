@@ -15,9 +15,11 @@ public class ShiftPreferenceEntity {
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Long id;  // DB側では自動採番を想定（Employee.idとは別管理でもOK）
 	 
+	 //社員番号
 	 @Column(nullable = false)
 	 private Integer employeeNumber;
 	 
+	 //希望を入力する日付
 	 @Column(nullable = false)
 	 private LocalDate date;
 	 
