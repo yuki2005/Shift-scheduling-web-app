@@ -4,10 +4,23 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
+/**
+ * 1日分のシフトにおける「時間帯 × ポジション」の
+ * 必要最低人数を定義する業務ルールクラス。
+ *
+ * ・曜日および祝日判定を基に、必要人数を自動的に決定する
+ * ・ピーク時間帯（LUNCH / DINNER）と
+ *   アイドル時間帯（TOP / IDLE / LAST）で異なる配置ルールを持つ
+ *
+ * 自動シフト生成ロジックにおいて、
+ * 人数不足判定や割り当て可否判定の基準として使用される。
+ */
 public class Schedule {
-	//各時間帯での各ポジションの必要最低人数を記録
+	
+	// 各時間帯ごとのポジション別必要最低人数
 	private final Map<ShiftTime, Map<Pos, Integer>> requiredCountsByTime;
 	
+	// 祝日フラグ（曜日判定と併用）
 	private final boolean isHoliday;
 	
 	//コンストラクタ
@@ -61,12 +74,17 @@ public class Schedule {
 	}
 	
 	/**
-	 * 各時間帯の各ポジションの最低人数を取得する (二次元マップを返す)
+	 * 各時間帯・各ポジションの必要最低人数を取得する。
+	 *
+	 * @return 時間帯 × ポジション × 必要人数の二次元マップ
 	 */
 	public Map<ShiftTime, Map<Pos, Integer>> getRequiredCountsByTime() {
 		return Collections.unmodifiableMap(requiredCountsByTime);
 	}
-	
+	/**
+	 * 休日フラグの取得
+	 * @return isHoliday
+	 */
 	public boolean isHoliday() {
 		return isHoliday;
 	}

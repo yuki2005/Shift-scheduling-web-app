@@ -6,17 +6,40 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.EnumMap;
 
+/**
+ * 従業員のシフト希望を表すドメインモデルクラス。
+ *
+ * ・1人の従業員が、特定の日付において
+ *   各時間帯に勤務可能かどうかを保持する
+ * ・希望情報は ShiftTime をキーとしたマップで管理される
+ *
+ * 本クラスは業務ロジックで使用されるモデルであり、
+ * 永続化や通信の責務は持たない。
+ */
 public class ShiftPreference {
-	//従業員の情報
+	
+	// 希望を提出した従業員
 	private final Employee employee;
 	
-	//日付
+	// 希望対象の日付
 	private final LocalDate date;
 	
-	//各時間帯で出勤可能かどうか　false:出勤不可 true:出勤可
+	// 各時間帯における勤務可否（0: 不可, 1: 可）
+	// 将来的な段階評価（0〜n）への拡張を考慮
 	private final Map<ShiftTime, Integer> availabilityMap;
 	
-	//コンストラクタ
+	/**
+	 * 文字列キーの希望マップを ShiftTime enum に変換し、
+	 * ShiftPreference インスタンスを生成する。
+	 *
+	 * DTO や JSON 入力を想定した変換処理であり、
+	 * 不正なキーは警告を出した上で無視する。
+	 *
+	 * @param employee 従業員情報
+	 * @param initialAvailabilityMap 文字列キーの希望マップ
+	 * @param date 希望対象日付
+	 * @return 生成された ShiftPreference
+	 */
 	public static ShiftPreference fromStringMap(Employee employee, Map<String, Integer> initialAvailabilityMap, LocalDate date) {
 		
 		if (initialAvailabilityMap == null) {
@@ -34,19 +57,29 @@ public class ShiftPreference {
             }
         }
         
-     /* 🟡 デバッグ出力追加
-        System.out.println("[DEBUG] ShiftPreference created for " + employee.getName() + ": " + converted);
-        */
         return new ShiftPreference(employee, converted, date);
 	}
 	
+	/**
+	 * ShiftTime をキーとした希望マップから
+	 * ShiftPreference を生成する。
+	 *
+	 * 内部的には Map を不変化して保持する。
+	 */
 	public ShiftPreference(Employee employee, Map<ShiftTime, Integer> availabilityMap, LocalDate date) {
         this.employee = employee;
         this.availabilityMap = Collections.unmodifiableMap(new EnumMap<>(availabilityMap));
         this.date = date;
     }
 	
-	//受け取った時間帯に出勤可能かを取得
+
+	/**
+	 * 指定した時間帯における勤務可否を取得する。
+	 *
+	 * @param time 時間帯
+	 * @return 勤務可否（0: 不可, 1: 可）
+	 */
+	// 将来性を考えて実装
 	public int getAvailability(ShiftTime time) {
 		return availabilityMap.getOrDefault(time, 0);
 	}

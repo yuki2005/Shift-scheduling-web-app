@@ -13,6 +13,16 @@ import Position.ShiftPreference;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * 従業員のシフト希望情報を管理するサービスクラス。
+ * Controller と Repository の間に位置し、
+ * シフト希望の保存・取得に関する業務ロジックを集約する。
+ *
+ * ・希望シフトは「ヘッダ（従業員＋日付）」と
+ *   「時間帯ごとの明細」に分けて管理する
+ * ・更新時は既存明細を削除し、最新の希望内容で再作成する
+ */
+
 @Service
 @Transactional
 public class ShiftPreferenceService {
@@ -20,7 +30,8 @@ public class ShiftPreferenceService {
     private final ShiftPreferenceRepository headerRepo;
     private final ShiftPreferenceDetailRepository detailRepo;
     private final EmployeeService employeeService;
-
+    
+ // ShiftPreference に関する Repository および EmployeeService を注入するコンストラクタ
     public ShiftPreferenceService(
             ShiftPreferenceRepository headerRepo,
             ShiftPreferenceDetailRepository detailRepo,
@@ -32,21 +43,24 @@ public class ShiftPreferenceService {
     }
 
     /**
-     * 希望の保存：
-     *  - header を取得（なければ新規作成）
-     *  - details を全削除
-     *  - availabilityMap を明細として再保存
+     * 従業員のシフト希望を保存する。
+     *
+     * ・従業員番号と日付をキーに希望ヘッダを取得
+     * ・存在しない場合は新規作成
+     * ・既存の希望明細は全て削除し、最新の希望内容で再保存する
+     *
+     * @param pref 保存対象のシフト希望情報
      */
     public void savePreference(ShiftPreference pref) {
 
         int empNum = pref.getEmployee().getId();
         LocalDate date = pref.getDate();
 
-        // ① 既存ヘッダを取得
+        // 既存ヘッダを取得
         ShiftPreferenceEntity existing =
                 headerRepo.findByEmployeeNumberAndDate(empNum, date);
 
-     // ② 新規の場合だけ作成 
+     // 新規の場合だけ作成 
         if (existing == null) { 
         	existing = new ShiftPreferenceEntity(); 
         	existing.setEmployeeNumber(empNum); 
@@ -55,10 +69,10 @@ public class ShiftPreferenceService {
         	}
         ShiftPreferenceEntity header = existing;
 
-        // ③ 明細を削除
+        // 明細を削除
         detailRepo.deleteAll(detailRepo.findByHeaderId(header.getId()));
 
-        // ④ 明細を再保存
+        // 明細を再保存
         pref.getAvailabilityMap().forEach((shiftTime, available) -> {
             ShiftPreferenceDetailEntity detail = new ShiftPreferenceDetailEntity();
             detail.setHeader(header);
@@ -69,8 +83,13 @@ public class ShiftPreferenceService {
     }
 
     /**
-     * 従業員 + 日付 で 1 件取得
+     * 従業員番号と日付を指定して、1件のシフト希望を取得する。
+     *
+     * @param employeeNumber 従業員番号
+     * @param date           対象日付
+     * @return 該当するシフト希望。存在しない場合は null
      */
+    // 将来性を考えての実装
     public ShiftPreference findOne(int employeeNumber, LocalDate date) {
 
         ShiftPreferenceEntity header =
@@ -96,8 +115,12 @@ public class ShiftPreferenceService {
     }
 
     /**
-     * ある社員の全希望
+     * 指定した従業員の全てのシフト希望を取得する。
+     *
+     * @param employeeNumber 従業員番号
+     * @return シフト希望の一覧
      */
+    // 将来性を考えての実装
     public List<ShiftPreference> findByEmployeeNumber(int employeeNumber) {
         List<ShiftPreferenceEntity> headers =
                 headerRepo.findByEmployeeNumber(employeeNumber);
@@ -125,7 +148,12 @@ public class ShiftPreferenceService {
         return list;
     }
     
-    //特定の日付の希望シフトを取得
+    /**
+     * 指定した日付の全従業員のシフト希望を取得する。
+     *
+     * @param date 対象日付
+     * @return 該当するシフト希望の一覧
+     */
     public List<ShiftPreference> findByDate(LocalDate date){
     	List<ShiftPreferenceEntity> headers =
     			headerRepo.findByDate(date);

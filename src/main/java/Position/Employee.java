@@ -1,7 +1,3 @@
-//社員番号
-//名前
-//従業員の能力値
-
 package Position;
 
 import java.util.HashMap;
@@ -9,12 +5,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Collections;
 
+/**
+ * 従業員を表すドメインモデルクラス。
+ *
+ * ・社員番号（業務上の一意キー）を識別子として持つ
+ * ・従業員名および各ポジションに対する能力値を管理する
+ *
+ * 本クラスは業務ロジックで使用されるモデルであり、
+ * 永続化や通信の責務は持たない。
+ */
 public class Employee {
-	//社員番号を記録する変数
+	
+	// 社員番号（業務上の一意キー）
 	private final int id;
-	//従業員の名前を記録する変数
+	
+	// 従業員名
 	private final String name;
-	//従業員の各能力値を記録するコレクション
+	
+	// 各ポジションに対する能力値（スキル）
 	private final Map<Pos, Integer> skills;
 	
 	//コンストラクタ
@@ -26,16 +34,32 @@ public class Employee {
 				: new HashMap<>(initialskills);
 	}
 	
-	//従業員の能力値を取り出す
+	/**
+	 * 指定したポジションの能力値を取得する。
+	 *
+	 * @param p     ポジション
+	 * @return skills.getOrDefault(p, 0)   ポジションの能力値
+	 */
 	public int getSkill(Pos p) {
 		return skills.getOrDefault(p, 0);
 	}
 	
+	/**
+	 * 全てのポジションの能力値を取得する。
+	 *
+	 * @return skills   全てのポジションの能力値
+	 */
 	public Map<Pos, Integer> getSkills(){
 		return Collections.unmodifiableMap(skills);
 	}
 	
-	//従業員の能力値を更新する
+	/**
+	 * 指定したポジションの能力値を更新する。
+	 *
+	 * @param p     ポジション
+	 * @param value 能力値（0〜100）
+	 * @throws IllegalArgumentException 能力値が範囲外の場合
+	 */
 	public void setSkills(Pos p, int value) {
 		//入力で与えられた数値が0以上100以下である必要がある
 		if(value < 0 || value > 100) {

@@ -14,6 +14,15 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 自動生成されたシフト結果（確定シフト）を管理するサービスクラス。
+ * Controller と Repository の間に位置し、
+ * シフト履歴の永続化、上書き判定、明細データの再構築といった
+ * 業務ロジックを集約する。
+ *
+ * ・シフト全体は JSON として履歴保存
+ * ・同時に、検索・集計用に明細テーブルへ正規化して保存する
+ */
 @Service
 @Transactional
 public class FinalShiftRecordService {
@@ -22,7 +31,8 @@ public class FinalShiftRecordService {
     private final FinalShiftRecordAssignmentRepository assignRepo;
     
     private final ObjectMapper mapper = new ObjectMapper();
-
+    
+    //コンストラクタ
     public FinalShiftRecordService(
             FinalShiftRecordRepository recordRepo,
             FinalShiftRecordAssignmentRepository assignRepo
@@ -32,7 +42,16 @@ public class FinalShiftRecordService {
     }
 
     /**
-     * フロントからの "Assign結果(JSON)" を保存する
+     * フロントエンドから送信された確定シフト結果（JSON形式）を保存する。
+     *
+     * ・同一日付のシフトが既に存在する場合は、overwrite フラグにより
+     *   上書き可否を判定する
+     * ・シフト全体は JSON として保存し、
+     *   各時間帯・ポジション・従業員の割り当ては明細テーブルへ分解して保存する
+     *
+     * @param rawJson    フロントから送信されたシフト結果(JSON)
+     * @param overwrite  既存データを上書きするかどうか
+     * @return 保存されたシフトレコード
      */
     @SuppressWarnings("unchecked")
     public FinalShiftRecordEntity saveShift(Map<String, Object> rawJson, boolean overwrite) {
@@ -65,7 +84,7 @@ public class FinalShiftRecordService {
         record.setHoliday(isHoliday);
         record.setMessage(message);
         
-     // ===== finalAssignment を Map として取得（明細用）=====
+     // finalAssignment を Map として取得（明細用）
         Object finalAssignmentRaw = rawJson.get("finalAssignment");
 
         if (!(finalAssignmentRaw instanceof Map)) {
@@ -76,7 +95,7 @@ public class FinalShiftRecordService {
         Map<String, Object> finalAssignmentObj =
                 (Map<String, Object>) finalAssignmentRaw;
 
-        // ===== JSON保存（履歴用）=====
+        // JSON保存（履歴用）
         try {
             record.setFinalAssignmentJson(
                 mapper.writeValueAsString(finalAssignmentObj)
@@ -87,7 +106,7 @@ public class FinalShiftRecordService {
         
         record = recordRepo.save(record);
         
-     // ===== 明細保存 =====
+        // シフト明細の保存
         for (Map.Entry<String, Object> entry : finalAssignmentObj.entrySet()) {
             String shiftTime = entry.getKey();
             Map<String, Object> posMap = (Map<String, Object>) entry.getValue();
@@ -115,6 +134,16 @@ public class FinalShiftRecordService {
         return record;
     }
     
+    /**
+     * 保存済みのシフト情報を更新する。
+     *
+     * ・指定されたレコードIDを基に対象シフトを取得
+     * ・JSON形式のシフト履歴を更新
+     * ・既存の明細データを一旦削除し、最新の割り当て内容で再作成する
+     *
+     * @param recordId        更新対象のシフトレコードID
+     * @param finalAssignment 更新後のシフト割り当て情報
+     */
     @SuppressWarnings("unchecked")
     public void updateShift(Long recordId, Map<String, Object> finalAssignment) {
 
@@ -161,16 +190,30 @@ public class FinalShiftRecordService {
     }
 
     /**
-     * 全履歴を日付降順で取得
+     * 保存されている全てのシフト履歴を日付の降順で取得する。
+     *
+     * @return シフト履歴一覧
      */
     public List<FinalShiftRecordEntity> findAll() {
         return recordRepo.findAllByOrderByDateDesc();
     }
-
+    
+    /**
+     * 指定した日付のシフト履歴を取得する。
+     *
+     * @param date 検索対象の日付
+     * @return 該当するシフト履歴
+     */
     public List<FinalShiftRecordEntity> findByDate(LocalDate date) {
         return recordRepo.findByDate(date);
     }
     
+    /**
+     * 指定した日付のシフトが既に保存されているかを判定する。
+     *
+     * @param date 判定対象の日付
+     * @return 存在する場合は true
+     */
     public boolean exists(LocalDate date) {
         return recordRepo.existsByDate(date);
     }
