@@ -11,5 +11,5 @@ public interface StaffSelectStrategy {
 	 * @param targetTimes 従業員の選出を行う時間帯
 	 * @return 出勤する人のリスト
 	 */
-	List<Employee> selectStaff(List<Employee> ableStaff, Schedule conditions, List<ShiftPreference> shiftPreferences, List<ShiftTime> targetTime);
+	List<Employee> selectStaff(List<Employee> ableStaff, Schedule conditions, List<ShiftPreference> shiftPreferences, ShiftTime targetTime);
 }

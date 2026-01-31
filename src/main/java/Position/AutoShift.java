@@ -19,13 +19,11 @@ public class AutoShift {
 		
 		for(ShiftTime targetTime : ShiftTime.values()) {
 			
-			List<ShiftTime> targetTimes = List.of(targetTime);
-			
 			List<Employee> selectedStaff = staffSelectStrategy.selectStaff(
 	                ableStaff, 
 	                conditions, 
 	                shiftPreferences, 
-	                targetTimes // ターゲット時間帯を渡す
+	                targetTime // ターゲット時間帯を渡す
 	            );
 			
 			result.put(targetTime, Collections.unmodifiableList(selectedStaff)); 

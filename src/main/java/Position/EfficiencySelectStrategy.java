@@ -9,12 +9,19 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
+/**
+ * 出勤可能な従業員の中から、
+ * 「汎用的にスキルが高い人」を優先して選定する戦略。
+ *
+ * ポジション割当は行わず、
+ * あくまで候補者選定に責務を限定している。
+ */
 @Component
 public class EfficiencySelectStrategy implements StaffSelectStrategy{
 	
 	@Override
 	public List<Employee> selectStaff(List<Employee> ableStaff, Schedule conditions, 
-                                      List<ShiftPreference> shiftPreferences, List<ShiftTime> targetTimes){
+                                      List<ShiftPreference> shiftPreferences, ShiftTime targetTime){
 		
         // Employee ID をキーとする ShiftPreference の Map を作成 (高速検索のため)
         Map<Integer, ShiftPreference> preferenceMap = shiftPreferences.stream()
@@ -30,35 +37,26 @@ public class EfficiencySelectStrategy implements StaffSelectStrategy{
                     }
 
                     // 🔧 修正：1つでも出勤可能な時間があればOK（以前は「全て出られないと除外」だった）
-                    boolean canWork = targetTimes.stream()
-                            .anyMatch(time -> pref.getAvailability(time) > 0);
-
-                    // --- デバッグ出力 ---
-                    System.out.println("【DEBUG】" + employee.getName() + " の可用性:");
-                    for (ShiftTime time : targetTimes) {
-                        System.out.println("   " + time + ": " + pref.getAvailability(time));
-                    }
-                    System.out.println("   ⇒ 判定結果: " + (canWork ? "出勤可能" : "除外"));
+                    boolean canWork = pref.getAvailability(targetTime) > 0;
 
                     return canWork;
                 })
                 .collect(Collectors.toList());
         
+        /*
         if (viableStaff.isEmpty()) {
             System.out.println("⚠️ どの従業員も targetTimes に対応できませんでした。");
         }
+        */
 
         // スキル合計値の計算 (フィルタリング後の viableStaff を使用)
 		Map<Employee, Integer> allSkills = allSkill(viableStaff); 
 		
 		List<Employee> sortedStaffs = new ArrayList<>(getSortedSkillList(allSkills));
-		
-		// targetTimes は基本1つの時間帯が入る想定
-		ShiftTime target = targetTimes.get(0);
 
 		// その時間帯だけの必要人数合計
 		int requiredCount = conditions.getRequiredCountsByTime()
-		        .getOrDefault(target, Map.of())
+		        .getOrDefault(targetTime, Map.of())
 		        .values().stream()
 		        .mapToInt(Integer::intValue)
 		        .sum();

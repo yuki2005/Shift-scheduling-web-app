@@ -60,4 +60,19 @@ public class EmployeeDto {
 
         return new Employee(this.id, this.name, convertedSkills);
     }
+    
+    public static EmployeeDto fromEmployee(Employee employee) {
+	    EmployeeDto dto = new EmployeeDto();
+	    dto.setId(employee.getId());
+	    dto.setName(employee.getName());
+
+	    Map<String, Integer> skills = employee.getSkills().entrySet().stream()
+	            .collect(Collectors.toMap(
+	                    e -> e.getKey().name(),
+	                    Map.Entry::getValue
+	            ));
+	    dto.setSkills(skills);
+
+	    return dto;
+	}
 }

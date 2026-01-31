@@ -36,8 +36,10 @@ public class EmployeeController {
 	 * @return 従業員情報の一覧
 	 */
 	@GetMapping
-	public List<Employee> getAll(){
-		return employeeService.findAll();
+	public List<EmployeeDto> getAll() {
+	    return employeeService.findAll().stream()
+	            .map(EmployeeDto::fromEmployee)
+	            .toList();
 	}
 	
 	/**
@@ -47,8 +49,9 @@ public class EmployeeController {
 	 * @return 該当する従業員情報
 	 */
 	@GetMapping("/{id}")
-	   public Employee getById(@PathVariable int id) {
-	       return employeeService.findByEmployeeNumber(id);
+	public EmployeeDto getById(@PathVariable int id) {
+	    Employee employee = employeeService.findByEmployeeNumber(id);
+	    return EmployeeDto.fromEmployee(employee);
 	}
 	
 	/**
@@ -58,9 +61,9 @@ public class EmployeeController {
 	 * @return 登録後の従業員情報
 	 */
 	@PostMapping
-	public Employee create(@RequestBody EmployeeDto dto) {
-		Employee employee = dto.toEmployee();
-		return employeeService.save(employee);
+	public EmployeeDto create(@RequestBody EmployeeDto dto) {
+	    Employee saved = employeeService.save(dto.toEmployee());
+	    return EmployeeDto.fromEmployee(saved);
 	}
 	
 	/**
@@ -81,11 +84,12 @@ public class EmployeeController {
      * @return 更新後の従業員情報
      */
     @PutMapping("/{employeeNumber}")
-    public Employee update(
+    public EmployeeDto update(
             @PathVariable int employeeNumber,
             @RequestBody EmployeeDto dto
     ) {
         dto.setId(employeeNumber);
-        return employeeService.update(dto.toEmployee());
+        Employee updated = employeeService.update(dto.toEmployee());
+        return EmployeeDto.fromEmployee(updated);
     }
 }
