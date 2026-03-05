@@ -1,4 +1,4 @@
-package Position;
+package Position.controller;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,6 +8,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import Position.AutoShift;
+import Position.DayOfWeek;
+import Position.Employee;
+import Position.Pos;
+import Position.PosAssign;
+import Position.Schedule;
+import Position.ShiftPreference;
+import Position.ShiftRequest;
+import Position.ShiftResponse;
+import Position.ShiftTime;
 
 @RestController
 @RequestMapping("/api/shift")
