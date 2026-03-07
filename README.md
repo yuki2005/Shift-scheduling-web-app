@@ -79,43 +79,6 @@ Controller / Service / Repository を分離した
 レイヤードアーキテクチャを採用しており、
 スタッフ選定ロジックは Strategy パターンとして service 層に実装しています。
 
-```text
-src
-└─ main
-   ├─ java
-   │  └─ Position
-   │     ├─ controller
-   │     │  └─ ShiftAssignController.java
-   │     ├─ service
-   │     │  ├─ AutoShiftService.java
-   │     │  ├─ PosAssignService.java
-   │     │  └─ strategy
-   │     │     ├─ AssignmentStrategy.java
-   │     │     ├─ MaxSkillStrategy.java
-   │     │     └─ EfficiencySelectStrategy.java
-   │     ├─ repository
-   │     │  ├─ EmployeeRepository.java
-   │     │  └─ ShiftRecordRepository.java
-   │     ├─ entity
-   │     │  ├─ Employee.java
-   │     │  ├─ ShiftPreference.java
-   │     │  ├─ FinalShiftRecord.java
-   │     │  └─ FinalShiftRecordAssignment.java
-   │     ├─ dto
-   │     │  ├─ EmployeeDto.java
-   │     │  └─ ShiftResultDto.java
-   │     ├─ mapper
-   │     │  └─ ShiftMapper.java
-   │     └─ Main.java
-   └─ resources
-      ├─ static
-      └─ application.properties.example
-
-pom.xml
-README.md
-.gitignore
-```
-
 ---
 
 ## 6. データベース設計（ER図）
