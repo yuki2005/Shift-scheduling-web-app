@@ -1,20 +1,22 @@
-# Eclipse Files
+# Eclipse
 .classpath
 .project
 .settings/
 
-# Maven build directory
+# Maven
 /target/
 /bin/
 
-# Spring Boot auto-generated files
+# Logs
 *.log
-*.jar
-*.war
 
-# Operating system files
+# OS
 .DS_Store
 Thumbs.db
 
-# Spring Boot config
+# Spring Boot
 application.properties
+.env
+
+# Java
+*.class
