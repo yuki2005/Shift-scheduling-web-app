@@ -21,6 +21,9 @@ Java / Spring Boot / PostgreSQL / REST API / JPA / Web Application
 
 を行うことができます。
 
+シフト作成者が最終確認と微調整に集中できるよう、
+シフト作成業務の効率化を目的として設計しました。
+
 ---
 
 ## 2. 動作紹介動画（Demo）
