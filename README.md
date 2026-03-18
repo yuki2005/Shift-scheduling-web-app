@@ -182,110 +182,141 @@ src
 
 ## 9. クラス設計
 
-本アプリケーションでは、シフト自動生成ロジックを **Strategy パターン** により分離し、  
-平日・休日や選定方針の違いに柔軟に対応できる設計としています。
+本アプリケーションでは、シフト生成処理を
+
+- 出勤者選定
+- ポジション割り当て
+
+の2段階に分離しています。
+
+出勤者選定では `StaffSelectStrategy` を用いて候補者の選定基準を切り替え可能にし、  
+ポジション割り当てでは `AssignmentStrategy` と `AssignmentStrategyFactory` により  
+平日・休日で異なる割り当てロジックを適用しています。
 
 ### クラス図
 
 ```mermaid
 classDiagram
 
+class ShiftAssignController {
+  +assignShift(request) ShiftResponse
+}
+
 class AutoShift {
-  +createShift(...)
+  - StaffSelectStrategy staffSelectStrategy
+  +selectWorkingStaffByTime(ableStaff, conditions, shiftPreferences) Map~ShiftTime, List~Employee~~
 }
 
 class PosAssign {
-  +assignPosition(...)
-}
-
-class AssignmentStrategy {
-  <<interface>>
-  +assign(...)
-}
-
-class AbstractAssignmentStrategy {
-  +assign(...)
-  #commonAssignLogic(...)
-}
-
-class WeekdayAssignmentStrategy {
-  +assign(...)
-}
-
-class HolidayAssignmentStrategy {
-  +assign(...)
-}
-
-class AssignmentStrategyFactory {
-  +createStrategy(dayType)
+  - AssignmentStrategyFactory strategyFactory
+  +execute(staffByTime, conditions) Map~ShiftTime, Map~Pos, List~Employee~~
 }
 
 class StaffSelectStrategy {
   <<interface>>
-  +selectStaff(...)
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
 }
 
 class EfficiencySelectStrategy {
-  +selectStaff(...)
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
 }
 
-class MaxSkillStrategy {
-  +selectStaff(...)
+class AssignmentStrategy {
+  <<interface>>
+  +assign(staff, conditions, time) Map~Pos, List~Employee~~
 }
 
-class PreferenceAwareStrategy {
-  +selectStaff(...)
+class AbstractAssignmentStrategy {
+  #assignFixedPositionStaff(staff, requiredCount, assignedStaff) Map~Pos, List~Employee~~
+  #getSortedPosByWeight() List~Pos~
+  #calcOverallSkill(staff) Map~Employee, Integer~
+}
+
+class WeekdayAssignmentStrategy {
+  +assign(staff, conditions, time) Map~Pos, List~Employee~~
+}
+
+class HolidayAssignmentStrategy {
+  +assign(staff, conditions, time) Map~Pos, List~Employee~~
+}
+
+class AssignmentStrategyFactory {
+  +get(isHoliday) AssignmentStrategy
+}
+
+class ShiftRequest {
+  - dayOfWeekString : String
+  - date : LocalDate
+  - isHoliday : boolean
+  +toEmployeeList() List~Employee~
+  +toPreferenceList(employees) List~ShiftPreference~
+  +getDayOfWeek() DayOfWeek
+  +getIsHolidayFlag() boolean
+}
+
+class ShiftResponse {
+  - finalAssignment
+  - workingStaff
+  - message : String
+  - date : LocalDate
+  - dayOfWeek : String
+  - isHoliday : boolean
 }
 
 class Schedule {
-  +date
-  +dayOfWeek
-  +holiday
+  +isHoliday() boolean
+  +getRequiredCountsByTime()
 }
 
-class ShiftPreference {
-  +employeeNumber
-  +date
-  +availabilityMap
-}
+class Employee
+class ShiftPreference
+class ShiftTime
+class Pos
+class DayOfWeek
+class FinalShiftRecord
 
-class Employee {
-  +employeeNumber
-  +name
-  +skills
-}
+ShiftAssignController --> ShiftRequest : receives
+ShiftAssignController --> ShiftResponse : returns
+ShiftAssignController --> AutoShift : uses
+ShiftAssignController --> PosAssign : uses
+ShiftAssignController --> Schedule : creates
 
-class FinalShiftRecord {
-  +date
-  +dayOfWeek
-  +holiday
-  +finalAssignmentJson
-  +message
-}
+AutoShift --> StaffSelectStrategy : uses
+AutoShift --> Employee : selects
+AutoShift --> ShiftPreference : refers
+AutoShift --> ShiftTime : groups by
+AutoShift --> Schedule : refers
 
-AutoShift --> Schedule : uses
-AutoShift --> PosAssign : uses
-AutoShift --> AssignmentStrategyFactory : uses
-AutoShift --> FinalShiftRecord : creates
+EfficiencySelectStrategy ..|> StaffSelectStrategy
+EfficiencySelectStrategy --> Employee : evaluates
+EfficiencySelectStrategy --> ShiftPreference : filters
+EfficiencySelectStrategy --> Schedule : refers
+EfficiencySelectStrategy --> ShiftTime : target
 
+PosAssign --> AssignmentStrategyFactory : uses
 PosAssign --> AssignmentStrategy : uses
-PosAssign --> ShiftPreference : refers
-PosAssign --> Employee : refers
+PosAssign --> Employee : assigns
+PosAssign --> Schedule : refers
+PosAssign --> ShiftTime : iterates by
+PosAssign --> Pos : assigns to
 
-AssignmentStrategy <|.. AbstractAssignmentStrategy
-AbstractAssignmentStrategy <|-- WeekdayAssignmentStrategy
-AbstractAssignmentStrategy <|-- HolidayAssignmentStrategy
+AbstractAssignmentStrategy ..|> AssignmentStrategy
+WeekdayAssignmentStrategy --|> AbstractAssignmentStrategy
+HolidayAssignmentStrategy --|> AbstractAssignmentStrategy
 
 AssignmentStrategyFactory --> AssignmentStrategy : creates
-WeekdayAssignmentStrategy --> StaffSelectStrategy : uses
-HolidayAssignmentStrategy --> StaffSelectStrategy : uses
 
-StaffSelectStrategy <|.. EfficiencySelectStrategy
-StaffSelectStrategy <|.. MaxSkillStrategy
-StaffSelectStrategy <|.. PreferenceAwareStrategy
+ShiftRequest --> Employee : converts to
+ShiftRequest --> ShiftPreference : converts to
+ShiftRequest --> DayOfWeek : converts to
 
-ShiftPreference --> Employee : belongs to
-FinalShiftRecord --> Employee : assigns
+ShiftResponse --> Employee : contains
+ShiftResponse --> ShiftTime : contains
+ShiftResponse --> Pos : contains
+
+FinalShiftRecord --> Employee
+FinalShiftRecord --> ShiftTime
+FinalShiftRecord --> Pos
 ```
 
 ### 設計上のポイント
