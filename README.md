@@ -182,11 +182,119 @@ src
 
 ## 9. クラス設計
 
-- ドメインモデル中心設計
-- Strategyパターンによるスタッフ選定ロジック分離
-- AutoShift / PosAssign による役割分担
+本アプリケーションでは、シフト自動生成ロジックを **Strategy パターン** により分離し、  
+平日・休日や選定方針の違いに柔軟に対応できる設計としています。
 
-将来的なアルゴリズム変更に対応できる設計にしています。
+### クラス図
+
+```mermaid
+classDiagram
+
+class AutoShift {
+  +createShift(...)
+}
+
+class PosAssign {
+  +assignPosition(...)
+}
+
+class AssignmentStrategy {
+  <<interface>>
+  +assign(...)
+}
+
+class AbstractAssignmentStrategy {
+  +assign(...)
+  #commonAssignLogic(...)
+}
+
+class WeekdayAssignmentStrategy {
+  +assign(...)
+}
+
+class HolidayAssignmentStrategy {
+  +assign(...)
+}
+
+class AssignmentStrategyFactory {
+  +createStrategy(dayType)
+}
+
+class StaffSelectStrategy {
+  <<interface>>
+  +selectStaff(...)
+}
+
+class EfficiencySelectStrategy {
+  +selectStaff(...)
+}
+
+class MaxSkillStrategy {
+  +selectStaff(...)
+}
+
+class PreferenceAwareStrategy {
+  +selectStaff(...)
+}
+
+class Schedule {
+  +date
+  +dayOfWeek
+  +holiday
+}
+
+class ShiftPreference {
+  +employeeNumber
+  +date
+  +availabilityMap
+}
+
+class Employee {
+  +employeeNumber
+  +name
+  +skills
+}
+
+class FinalShiftRecord {
+  +date
+  +dayOfWeek
+  +holiday
+  +finalAssignmentJson
+  +message
+}
+
+AutoShift --> Schedule : uses
+AutoShift --> PosAssign : uses
+AutoShift --> AssignmentStrategyFactory : uses
+AutoShift --> FinalShiftRecord : creates
+
+PosAssign --> AssignmentStrategy : uses
+PosAssign --> ShiftPreference : refers
+PosAssign --> Employee : refers
+
+AssignmentStrategy <|.. AbstractAssignmentStrategy
+AbstractAssignmentStrategy <|-- WeekdayAssignmentStrategy
+AbstractAssignmentStrategy <|-- HolidayAssignmentStrategy
+
+AssignmentStrategyFactory --> AssignmentStrategy : creates
+WeekdayAssignmentStrategy --> StaffSelectStrategy : uses
+HolidayAssignmentStrategy --> StaffSelectStrategy : uses
+
+StaffSelectStrategy <|.. EfficiencySelectStrategy
+StaffSelectStrategy <|.. MaxSkillStrategy
+StaffSelectStrategy <|.. PreferenceAwareStrategy
+
+ShiftPreference --> Employee : belongs to
+FinalShiftRecord --> Employee : assigns
+```
+
+### 設計上のポイント
+
+- `AutoShift` はシフト生成全体を統括するクラス
+- `PosAssign` は時間帯・ポジションごとの割り当て処理を担当
+- `AssignmentStrategy` により、平日・休日で異なる割り当て方針を切り替え
+- `StaffSelectStrategy` により、スキル重視・効率重視・希望重視などの選定基準を分離
+- Strategy パターンの採用により、選定ロジックの追加や変更を既存コードへの影響を抑えて行えるようにした
 
 ---
 
