@@ -2,8 +2,8 @@ package position.controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import position.FinalShiftRecordSaveRequest;
 import position.dto.FinalShiftRecordDto;
+import position.dto.FinalShiftRecordSaveRequest;
 import position.dto.FinalShiftUpdateRequest;
 import position.entity.FinalShiftRecordEntity;
 import position.mapper.FinalShiftRecordMapper;

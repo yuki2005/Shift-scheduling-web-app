@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import position.Employee;
-import position.Pos;
 import position.entity.EmployeeEntity;
+import position.model.Employee;
+import position.model.Pos;
 
 import java.util.HashMap;
 import java.util.Map;

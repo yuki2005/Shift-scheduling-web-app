@@ -1,8 +1,14 @@
-package position;
+package position.util;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import position.model.Employee;
+import position.model.Pos;
+import position.model.Schedule;
+import position.model.ShiftTime;
+
 import java.util.Collections;
 
 public class ResultPrinter {

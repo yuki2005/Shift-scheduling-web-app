@@ -1,5 +1,6 @@
-package position;
+package position.strategy;
 
+import position.model.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;

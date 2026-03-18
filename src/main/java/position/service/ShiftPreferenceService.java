@@ -3,10 +3,10 @@ package position.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import position.Employee;
-import position.ShiftPreference;
 import position.entity.ShiftPreferenceDetailEntity;
 import position.entity.ShiftPreferenceEntity;
+import position.model.Employee;
+import position.model.ShiftPreference;
 import position.repository.ShiftPreferenceDetailRepository;
 import position.repository.ShiftPreferenceRepository;
 
@@ -102,11 +102,11 @@ public class ShiftPreferenceService {
 
         Employee emp = employeeService.findByEmployeeNumber(employeeNumber);
 
-        Map<position.ShiftTime, Integer> availability = new HashMap<>();
+        Map<position.model.ShiftTime, Integer> availability = new HashMap<>();
 
         for (ShiftPreferenceDetailEntity d : details) {
             availability.put(
-                    position.ShiftTime.valueOf(d.getShiftTime()),
+                    position.model.ShiftTime.valueOf(d.getShiftTime()),
                     d.getAvailability()
             );
         }
@@ -133,11 +133,11 @@ public class ShiftPreferenceService {
             List<ShiftPreferenceDetailEntity> details =
                     detailRepo.findByHeaderId(header.getId());
 
-            Map<position.ShiftTime, Integer> availability = new HashMap<>();
+            Map<position.model.ShiftTime, Integer> availability = new HashMap<>();
 
             for (ShiftPreferenceDetailEntity d : details) {
                 availability.put(
-                        position.ShiftTime.valueOf(d.getShiftTime()),
+                        position.model.ShiftTime.valueOf(d.getShiftTime()),
                         d.getAvailability()
                 );
             }
@@ -167,11 +167,11 @@ public class ShiftPreferenceService {
     		List<ShiftPreferenceDetailEntity> details = 
     				detailRepo.findByHeaderId(header.getId());
     		
-    		Map<position.ShiftTime, Integer> availability = new HashMap<>();
+    		Map<position.model.ShiftTime, Integer> availability = new HashMap<>();
     		
     		for(ShiftPreferenceDetailEntity d : details) {
     			availability.put(
-    					position.ShiftTime.valueOf(d.getShiftTime()),
+    					position.model.ShiftTime.valueOf(d.getShiftTime()),
     					d.getAvailability()
     			);
     		}

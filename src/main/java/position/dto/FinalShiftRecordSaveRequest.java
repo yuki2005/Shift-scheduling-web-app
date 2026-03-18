@@ -1,12 +1,10 @@
-package position;
+package position.dto;
 
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import position.dto.AssignedStaffDto;
 
 /**
  * 確定シフト保存リクエストDTO。

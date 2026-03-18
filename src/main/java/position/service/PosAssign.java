@@ -1,6 +1,14 @@
-package position;
+package position.service;
 
 import org.springframework.stereotype.Service;
+
+import position.factory.AssignmentStrategyFactory;
+import position.model.Employee;
+import position.model.Pos;
+import position.model.Schedule;
+import position.model.ShiftTime;
+import position.strategy.AssignmentStrategy;
+
 import java.util.*;
 
 @Service

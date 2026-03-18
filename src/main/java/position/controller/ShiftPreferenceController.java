@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import position.Employee;
-import position.ShiftPreference;
 import position.dto.ShiftPreferenceDto;
+import position.model.Employee;
+import position.model.ShiftPreference;
 import position.service.EmployeeService;
 import position.service.ShiftPreferenceService;
 
@@ -65,7 +65,7 @@ public class ShiftPreferenceController {
                 emp,
                 dto.getAvailabilityMap().entrySet().stream()
                         .collect(Collectors.toMap(
-                                e -> position.ShiftTime.valueOf(e.getKey()),
+                                e -> position.model.ShiftTime.valueOf(e.getKey()),
                                 Map.Entry::getValue
                         )),
                 dto.getDate()

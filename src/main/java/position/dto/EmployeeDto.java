@@ -3,8 +3,8 @@ package position.dto;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import position.Employee;
-import position.Pos;
+import position.model.Employee;
+import position.model.Pos;
 
 /**
  * 従業員情報をフロントエンドとの通信に使用する DTO クラス。

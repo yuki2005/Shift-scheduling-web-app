@@ -1,6 +1,11 @@
-package position;
+package position.strategy;
 
 import java.util.List;
+
+import position.model.Employee;
+import position.model.Schedule;
+import position.model.ShiftPreference;
+import position.model.ShiftTime;
 
 public interface StaffSelectStrategy {
 	/**

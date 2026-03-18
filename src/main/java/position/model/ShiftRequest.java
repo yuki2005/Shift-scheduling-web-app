@@ -1,4 +1,4 @@
-package position;
+package position.model;
 
 import java.time.LocalDate;
 import java.util.List;

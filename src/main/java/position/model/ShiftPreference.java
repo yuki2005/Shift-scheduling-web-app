@@ -1,4 +1,4 @@
-package position;
+package position.model;
 
 import java.util.Map;
 import java.util.HashMap;

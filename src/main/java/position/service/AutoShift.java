@@ -1,6 +1,13 @@
-package position;
+package position.service;
 
-import org.springframework.stereotype.Service; 
+import org.springframework.stereotype.Service;
+
+import position.model.Employee;
+import position.model.Schedule;
+import position.model.ShiftPreference;
+import position.model.ShiftTime;
+import position.strategy.StaffSelectStrategy;
+
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;

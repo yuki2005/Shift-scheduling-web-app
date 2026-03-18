@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import position.Employee;
 import position.entity.EmployeeEntity;
 import position.mapper.EmployeeMapper;
+import position.model.Employee;
 import position.repository.EmployeeRepository;
 
 import java.util.HashMap;

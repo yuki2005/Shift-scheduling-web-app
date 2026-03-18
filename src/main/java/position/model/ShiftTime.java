@@ -1,4 +1,4 @@
-package position;
+package position.model;
 
 /**
  * シフトの時間帯区分を表す ENUM。

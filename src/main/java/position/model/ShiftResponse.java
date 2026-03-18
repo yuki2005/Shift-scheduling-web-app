@@ -1,14 +1,10 @@
-package position;
+package position.model;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import position.Employee;
-import position.Pos;
-import position.ShiftTime;
 
 @RequestMapping
 public class ShiftResponse {

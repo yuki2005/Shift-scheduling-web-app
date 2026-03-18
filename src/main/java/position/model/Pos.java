@@ -1,4 +1,4 @@
-package position;
+package position.model;
 
 /**
  * シフトにおける担当ポジションを表す ENUM。

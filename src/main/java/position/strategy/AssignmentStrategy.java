@@ -1,7 +1,12 @@
-package position;
+package position.strategy;
 
 import java.util.List;
 import java.util.Map;
+
+import position.model.Employee;
+import position.model.Pos;
+import position.model.Schedule;
+import position.model.ShiftTime;
 
 public interface AssignmentStrategy {
 	

@@ -1,6 +1,10 @@
-package position;
+package position.factory;
 
 import org.springframework.stereotype.Component;
+
+import position.strategy.AssignmentStrategy;
+import position.strategy.HolidayAssignmentStrategy;
+import position.strategy.WeekdayAssignmentStrategy;
 
 @Component
 public class AssignmentStrategyFactory {

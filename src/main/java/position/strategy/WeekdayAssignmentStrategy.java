@@ -1,6 +1,12 @@
-package position;
+package position.strategy;
 
 import org.springframework.stereotype.Component;
+
+import position.model.Employee;
+import position.model.Pos;
+import position.model.Schedule;
+import position.model.ShiftTime;
+
 import java.util.*;
 
 @Component

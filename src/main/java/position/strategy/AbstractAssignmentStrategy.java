@@ -1,6 +1,9 @@
-package position;
+package position.strategy;
 
 import java.util.*;
+
+import position.model.Employee;
+import position.model.Pos;
 
 public abstract class AbstractAssignmentStrategy
         implements AssignmentStrategy {
