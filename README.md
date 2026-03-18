@@ -145,8 +145,8 @@ src
         └ application.properties
 ```
 
-スタッフ選定ロジックは  
-**Strategy パターン**として service 層に実装しています。
+スタッフ選定ロジックおよびポジション割り当てロジックは  
+`strategy` パッケージに分離し、Strategy パターンにより拡張しやすい構成としています。
 
 ---
 
@@ -203,41 +203,41 @@ class ShiftAssignController {
 }
 
 class AutoShift {
-  - StaffSelectStrategy staffSelectStrategy
-  +selectWorkingStaffByTime(ableStaff, conditions, shiftPreferences) Map~ShiftTime, List~Employee~~
+  - staffSelectStrategy : StaffSelectStrategy
+  +selectWorkingStaffByTime(ableStaff, conditions, shiftPreferences)
 }
 
 class PosAssign {
-  - AssignmentStrategyFactory strategyFactory
-  +execute(staffByTime, conditions) Map~ShiftTime, Map~Pos, List~Employee~~
+  - strategyFactory : AssignmentStrategyFactory
+  +execute(staffByTime, conditions)
 }
 
 class StaffSelectStrategy {
   <<interface>>
-  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime)
 }
 
 class EfficiencySelectStrategy {
-  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime)
 }
 
 class AssignmentStrategy {
   <<interface>>
-  +assign(staff, conditions, time) Map~Pos, List~Employee~~
+  +assign(staff, conditions, time)
 }
 
 class AbstractAssignmentStrategy {
-  #assignFixedPositionStaff(staff, requiredCount, assignedStaff) Map~Pos, List~Employee~~
-  #getSortedPosByWeight() List~Pos~
-  #calcOverallSkill(staff) Map~Employee, Integer~
+  #assignFixedPositionStaff(staff, requiredCount, assignedStaff)
+  #getSortedPosByWeight()
+  #calcOverallSkill(staff)
 }
 
 class WeekdayAssignmentStrategy {
-  +assign(staff, conditions, time) Map~Pos, List~Employee~~
+  +assign(staff, conditions, time)
 }
 
 class HolidayAssignmentStrategy {
-  +assign(staff, conditions, time) Map~Pos, List~Employee~~
+  +assign(staff, conditions, time)
 }
 
 class AssignmentStrategyFactory {
@@ -245,29 +245,15 @@ class AssignmentStrategyFactory {
 }
 
 class ShiftRequest {
-  - dayOfWeekString : String
-  - date : LocalDate
-  - isHoliday : boolean
-  +toEmployeeList() List~Employee~
-  +toPreferenceList(employees) List~ShiftPreference~
-  +getDayOfWeek() DayOfWeek
-  +getIsHolidayFlag() boolean
+  +toEmployeeList()
+  +toPreferenceList(employees)
+  +getDayOfWeek()
+  +getIsHolidayFlag()
 }
 
-class ShiftResponse {
-  - finalAssignment
-  - workingStaff
-  - message : String
-  - date : LocalDate
-  - dayOfWeek : String
-  - isHoliday : boolean
-}
+class ShiftResponse
 
-class Schedule {
-  +isHoliday() boolean
-  +getRequiredCountsByTime()
-}
-
+class Schedule
 class Employee
 class ShiftPreference
 class ShiftTime
@@ -282,23 +268,19 @@ ShiftAssignController --> PosAssign : uses
 ShiftAssignController --> Schedule : creates
 
 AutoShift --> StaffSelectStrategy : uses
+AutoShift --> Schedule : refers
 AutoShift --> Employee : selects
 AutoShift --> ShiftPreference : refers
 AutoShift --> ShiftTime : groups by
-AutoShift --> Schedule : refers
 
 EfficiencySelectStrategy ..|> StaffSelectStrategy
-EfficiencySelectStrategy --> Employee : evaluates
-EfficiencySelectStrategy --> ShiftPreference : filters
-EfficiencySelectStrategy --> Schedule : refers
-EfficiencySelectStrategy --> ShiftTime : target
 
 PosAssign --> AssignmentStrategyFactory : uses
 PosAssign --> AssignmentStrategy : uses
-PosAssign --> Employee : assigns
 PosAssign --> Schedule : refers
 PosAssign --> ShiftTime : iterates by
 PosAssign --> Pos : assigns to
+PosAssign --> Employee : assigns
 
 AbstractAssignmentStrategy ..|> AssignmentStrategy
 WeekdayAssignmentStrategy --|> AbstractAssignmentStrategy
@@ -496,7 +478,7 @@ mvn spring-boot:run
 または
 
 ```
-java -jar target/position.jar
+java -jar target/position-0.0.1-SNAPSHOT.jar
 ```
 
 ### 4. アクセス
@@ -507,7 +489,40 @@ http://localhost:8080
 
 ---
 
-## 16. 今後の改善予定
+## 16. 成果
+
+本アプリケーションにより、
+
+- シフト作成時間の削減
+- 作成者の負担軽減
+- 人的ミス（重複割り当て等）の防止
+
+を実現できる仕組みを構築しました。
+
+---
+
+## 17. インフラ構築（AWS） 
+
+※ 現在構築中 
+
+本アプリケーションは、AWS上でのデプロイを想定しています。  
+まずは無料利用枠を前提に、EC2上に Spring Boot アプリケーションと PostgreSQL を配置する構成を検討しています。  
+将来的には、アプリケーションサーバーとデータベースを分離し、EC2 + RDS 構成へ拡張する予定です。
+
+---
+
+## 18. 技術選定理由 
+
+- Spring Boot : 実務での利用を意識 
+- PostgreSQL : RDB理解のため 
+- JPA : ORM理解 
+- Vanilla JS : 基礎理解重視 
+
+---
+
+
+
+## 19. 今後の改善予定
 
 - UI / UX 改善
 - シフト生成アルゴリズム高度化
@@ -517,7 +532,7 @@ http://localhost:8080
 
 ---
 
-## 17. 学び
+## 20. 学び
 
 - 設計の重要性
 - エラー解析力
@@ -528,7 +543,7 @@ http://localhost:8080
 
 ---
 
-## 18. Author
+## 21. Author
 
 明治大学 理工学部 情報科学科  山下裕貴
 制作期間：2025年9月〜2026年3月
