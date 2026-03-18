@@ -126,10 +126,16 @@ src
     ├ java
     │   └ position
     │       ├ controller
-    │       ├ service
-    │       ├ repository
+    │       ├ dto
+    │       ├ entity
+    │       ├ factory
+    │       ├ mapper
     │       ├ model
-    │       └ dto
+    │       ├ repository
+    │       ├ service
+    │       ├ strategy
+    │       ├ util
+    │       └ PositionApplication.java
     │
     └ resources
         ├ static
@@ -146,23 +152,31 @@ src
 
 ## 8. データベース設計（ER）
 
-主要エンティティ
+本システムで使用している主要エンティティは以下の通りです。
 
 - Employee
-- ShiftPreference
+- ShiftPreferenceHeader
+- ShiftPreferenceDetail
 - FinalShiftRecord
 - FinalShiftRecordAssignment
 
+### ER図
+
+主要エンティティ間の関係を以下に示します。
+
+![ER図](docs/er.png)
+
 ### 設計上の工夫
 
-希望シフトは **正規化**
+希望シフトは **正規化** し、更新・整合性を重視しています。
 
-確定シフトは
+一方で確定シフトは、
 
-- JSON保存（履歴再現用）
+- JSON保存（履歴再現・表示用）
 - 明細テーブル（検索・編集用）
 
-の **ハイブリッド構成**を採用しています。
+の **ハイブリッド構成**を採用し、  
+用途に応じて最適なデータ構造を使い分けています。
 
 ---
 
