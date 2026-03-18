@@ -204,26 +204,26 @@ class ShiftAssignController {
 
 class AutoShift {
   - staffSelectStrategy : StaffSelectStrategy
-  +selectWorkingStaffByTime(ableStaff, conditions, shiftPreferences)
+  +selectWorkingStaffByTime(ableStaff, conditions, shiftPreferences) Map~ShiftTime, List~Employee~~
 }
 
 class PosAssign {
   - strategyFactory : AssignmentStrategyFactory
-  +execute(staffByTime, conditions)
+  +execute(staffByTime, conditions) Map~ShiftTime, Map~Pos, List~Employee~~
 }
 
 class StaffSelectStrategy {
   <<interface>>
-  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime)
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
 }
 
 class EfficiencySelectStrategy {
-  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime)
+  +selectStaff(ableStaff, conditions, shiftPreferences, targetTime) List~Employee~
 }
 
 class AssignmentStrategy {
   <<interface>>
-  +assign(staff, conditions, time)
+  +assign(staff, conditions, time) Map~Pos, List~Employee~~
 }
 
 class AbstractAssignmentStrategy {
@@ -245,10 +245,10 @@ class AssignmentStrategyFactory {
 }
 
 class ShiftRequest {
-  +toEmployeeList()
-  +toPreferenceList(employees)
-  +getDayOfWeek()
-  +getIsHolidayFlag()
+  +toEmployeeList() List~Employee~
+  +toPreferenceList(employees) List~ShiftPreference~
+  +getDayOfWeek() DayOfWeek
+  +getIsHolidayFlag() boolean
 }
 
 class ShiftResponse
@@ -268,25 +268,28 @@ ShiftAssignController --> PosAssign : uses
 ShiftAssignController --> Schedule : creates
 
 AutoShift --> StaffSelectStrategy : uses
-AutoShift --> Schedule : refers
 AutoShift --> Employee : selects
 AutoShift --> ShiftPreference : refers
 AutoShift --> ShiftTime : groups by
+AutoShift --> Schedule : refers
 
 EfficiencySelectStrategy ..|> StaffSelectStrategy
+EfficiencySelectStrategy --> Employee : evaluates
+EfficiencySelectStrategy --> ShiftPreference : filters
 
 PosAssign --> AssignmentStrategyFactory : uses
 PosAssign --> AssignmentStrategy : uses
+PosAssign --> Employee : assigns
 PosAssign --> Schedule : refers
 PosAssign --> ShiftTime : iterates by
 PosAssign --> Pos : assigns to
-PosAssign --> Employee : assigns
 
 AbstractAssignmentStrategy ..|> AssignmentStrategy
 WeekdayAssignmentStrategy --|> AbstractAssignmentStrategy
 HolidayAssignmentStrategy --|> AbstractAssignmentStrategy
 
-AssignmentStrategyFactory --> AssignmentStrategy : creates
+AssignmentStrategyFactory --> WeekdayAssignmentStrategy : creates
+AssignmentStrategyFactory --> HolidayAssignmentStrategy : creates
 
 ShiftRequest --> Employee : converts to
 ShiftRequest --> ShiftPreference : converts to
@@ -303,12 +306,12 @@ FinalShiftRecord --> Pos
 
 ### 設計上のポイント
 
-- `AutoShift` はシフト生成全体を統括するクラス
-- `PosAssign` は時間帯・ポジションごとの割り当て処理を担当
+- `AutoShift` は時間帯ごとの出勤者選定を担当
+- `PosAssign` は選定された従業員を時間帯・ポジションごとに割り当てる処理を担当
 - `AssignmentStrategy` により、平日・休日で異なる割り当て方針を切り替え
-- `StaffSelectStrategy` により、スキル重視・効率重視・希望重視などの選定基準を分離
+- `StaffSelectStrategy` により、出勤者選定基準を分離
+- `ShiftAssignController` はリクエストを受け取り、出勤者選定とポジション割り当てを組み合わせて最終的なシフト結果を生成する
 - Strategy パターンの採用により、選定ロジックの追加や変更を既存コードへの影響を抑えて行えるようにした
-
 ---
 
 ## 10. シフト自動生成アルゴリズム
