@@ -31,7 +31,7 @@ Java / Spring Boot / PostgreSQL / REST API / JPA / Web Application
 アプリケーションの基本的な操作は  
 以下の動画で確認できます。
 
-▶ **デモ動画（約1分30秒）**  
+▶ **デモ動画（約1分40秒）**  
 https://youtu.be/LU-z3zEHb18
 
 動画では以下の流れを紹介しています。
