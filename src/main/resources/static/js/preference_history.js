@@ -1,6 +1,6 @@
 // preference_history.js
 
-const API_PREF_BY_DATE = "http://localhost:8080/api/preferences/date";
+const API_PREF_BY_DATE = "/api/preferences/date";
 
 document.addEventListener("DOMContentLoaded", () => {
     const loadBtn = document.getElementById("loadPrefByDateBtn");

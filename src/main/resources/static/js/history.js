@@ -1,5 +1,5 @@
 // history.js
-const API_BASE = "http://localhost:8080/api/shift-records";
+const API_BASE = "/api/shift-records";
 
 async function loadHistory() {
     const tbody = document.getElementById("historyBody");

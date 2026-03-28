@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api/employees";
+const API_BASE = "/api/employees";
 
 // URLパラメータから ../employee_edit.html?id=1 の id を取得
 function getEmployeeIdFromUrl() {

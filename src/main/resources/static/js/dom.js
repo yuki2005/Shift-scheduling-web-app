@@ -13,9 +13,9 @@ let loadedPreferences = [];   // /api/preferences/date/... の結果
 // 定数
 // ==============================
 const SKILL_ORDER = ["D", "Y", "A", "I", "IF", "AF", "W"];
-const API_EMP  = "http://localhost:8080/api/employees";
-const API_PREF = "http://localhost:8080/api/preferences";
-const API_SHIFT = "http://localhost:8080/api/shift-records";
+const API_EMP  = "/api/employees";
+const API_PREF = "/api/preferences";
+const API_SHIFT = "/api/shift-records";
 
 // ==============================
 // 初期化（シフト作成ページ用）
@@ -247,7 +247,7 @@ async function saveCurrentShift() {
     let overwrite = false;
     try {
         const existsRes = await fetch(
-            `http://localhost:8080/api/shift-records/exists/${date}`
+            `${API_SHIFT}/exists/${date}`
         );
         const existsJson = await existsRes.json();
 
@@ -282,7 +282,7 @@ async function saveCurrentShift() {
     // ④ 保存
     try {
         const response = await fetch(
-            "http://localhost:8080/api/shift-records/save",
+             `${API_SHIFT}/save`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

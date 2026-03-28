@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api/employees";
+const API_BASE = "/api/employees";
 
 /** スライダーの現在値をまとめて返す */
 function collectSkills() {

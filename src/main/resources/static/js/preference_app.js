@@ -1,8 +1,8 @@
 //preference_app.js
 
 // API URL
-const API_EMP = "http://localhost:8080/api/employees";
-const API_PREF = "http://localhost:8080/api/preferences";
+const API_EMP = "/api/employees";
+const API_PREF = "/api/preferences";
 
 // キャッシュ
 let employeeCache = [];

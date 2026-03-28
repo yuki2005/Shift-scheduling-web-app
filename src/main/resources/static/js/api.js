@@ -1,7 +1,7 @@
 // api.js
 
-const API_ASSIGN = 'http://localhost:8080/api/shift/assign';
-const API_SAVE   = 'http://localhost:8080/api/shift-records/save';
+const API_ASSIGN = '/api/shift/assign';
+const API_SAVE   = '/api/shift-records/save';
 
 import DOMHandler from './dom.js';
 
