@@ -2,6 +2,10 @@ package position.strategy;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * 現在は未使用
+ */
+
 import position.model.Employee;
 import position.model.Pos;
 import position.model.Schedule;

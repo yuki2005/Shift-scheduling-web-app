@@ -1,6 +1,12 @@
 package position.util;
 
 import java.util.List;
+
+/**
+ * バックエンドの動作確認に使用。
+ * 現在は未使用。
+ */
+
 import java.util.Map;
 import java.util.stream.Collectors;
 
